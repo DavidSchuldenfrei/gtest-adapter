@@ -1,10 +1,9 @@
-interface IHash {
-    [key: string]: TestNode
-}
+export enum Status {Unknown, Passed, Failed}
 export class TestNode {
     private _name: string;
-    private _children: IHash;
-    private _fullnames: string[];
+    private _children: any;
+    private _fullnames: string[];;
+    public status: Status
 
     constructor(parentPath: string, name: string) {
         name = name.trim();
@@ -15,6 +14,20 @@ export class TestNode {
         }
         this._children = {};
         this._fullnames = [parentPath + name];
+        this.status = Status.Unknown;
+    }
+
+    public RefreshStatus() {
+        if (!this.isFolder)
+            return;
+        Object.keys(this._children).forEach(childName => { (this._children[childName] as TestNode).RefreshStatus(); });
+        if (Object.keys(this._children).find(childName => { return (this._children[childName] as TestNode).status == Status.Failed; })) {
+            this.status = Status.Failed;
+        } else if (Object.keys(this._children).find(childName => { return (this._children[childName] as TestNode).status == Status.Unknown; })) {
+            this.status = Status.Unknown;
+        } else {
+            this.status = Status.Passed;
+        }
     }
 
     private getname(name: string): string {
@@ -23,7 +36,7 @@ export class TestNode {
         if (paramPos > 0) {
             var start = result.substring(0, result.indexOf('/'));
             var parameters = result.substring(paramPos + 15);
-            if (!parameters.startsWith("(")) {
+			 if (!parameters.startsWith("(")) {
                  parameters = "(" + parameters + ")";
              }
              return start + parameters;
@@ -54,7 +67,7 @@ export class TestNode {
 
     public get children(): TestNode[] {
         var result: TestNode[] = [];
-        Object.keys(this._children).forEach((key) => result.push(this._children[key]));
+        Object.keys(this._children).forEach((key) => result.push(this._children[key] as TestNode));
         result.sort((a, b) => a.name.localeCompare(b.name));
         return result;
     }
@@ -63,8 +76,8 @@ export class TestNode {
         var existing = this._children[child.name];
         if (existing) {
             child._fullnames.forEach(fn => {
-                if (existing._fullnames.indexOf(fn) == -1) {
-                    existing._fullnames.push(fn);
+                if ((existing as TestNode)._fullnames.indexOf(fn) == -1) {
+                    (existing as TestNode)._fullnames.push(fn);
                 }
             })
             return existing;

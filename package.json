@@ -1,8 +1,8 @@
 {
     "name": "gtest-adapter",
     "displayName": "GTest Adapter",
-    "description": "Adapter to allow viewing GTests in tree view and to run/debug such tests",
-    "version": "1.0.0",
+    "description": "Easily run GTests from VsCode",
+    "version": "0.0.1",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.23.0"
@@ -19,17 +19,17 @@
             {
                 "command": "gtestExplorer.refresh",
                 "title": "Refresh",
-                "icon": {
-                    "light": "resources/light/refresh.svg",
-                    "dark": "resources/dark/refresh.svg"
-                }
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}                
             },
             {
                 "command": "gtestExplorer.run",
                 "title": "Run",
                 "icon": {
-                    "light": "resources/continue.svg",
-                    "dark": "resources/continue.svg"
+                    "light": "resources/run.svg",
+                    "dark": "resources/run.svg"
                 }
             },
             {
@@ -43,6 +43,14 @@
             {
                 "command": "gtestExplorer.setCurrent",
                 "title": "_"
+            },
+            {
+                "command": "gtestExplorer.runAll",
+                "title": "Run All",
+                "icon": {
+                    "light": "resources/runAll.svg",
+                    "dark": "resources/runAll.svg"
+                }                
             }
         ],
         "menus": {
@@ -50,15 +58,20 @@
                 {
                     "command": "gtestExplorer.refresh",
                     "when": "view == gtestExplorer",
-                    "group": "navigation@2"
+                    "group": "navigation@3"
                 },
                 {
                     "command": "gtestExplorer.debug",
                     "when": "view == gtestExplorer",
-                    "group": "navigation@1"
+                    "group": "navigation@2"
                 },
                 {
                     "command": "gtestExplorer.run",
+                    "when": "view == gtestExplorer",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "gtestExplorer.runAll",
                     "when": "view == gtestExplorer",
                     "group": "navigation@0"
                 }
@@ -88,9 +101,9 @@
         "views": {
             "explorer": [
                 {
-                    "id": "gtestExplorer",
-                    "name": "Test Explorer"
-                }
+					"id": "gtestExplorer",
+					"name": "Test Explorer"
+				}                
             ]
         }
     },
@@ -104,7 +117,6 @@
     "devDependencies": {
         "typescript": "^2.6.1",
         "vscode": "^1.1.6",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "@types/node": "^7.0.43"
     }
 }

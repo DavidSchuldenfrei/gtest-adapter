@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { TestTreeDataProvider } from './TestTreeDataProvider';
 import { TestNode } from "./TestNode";
-import { CppDebugConfig } from './CppDebugConfig';
 
 export class TestExplorer {
 
@@ -13,10 +12,9 @@ export class TestExplorer {
 
         this.treeDataProvider = treeDataProvider;
 
-        //vscode.debug.startDebugging(rootPath, )
-
-        context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.refresh', () => this.treeDataProvider.refresh()));
+        context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.refresh', () => this.treeDataProvider.reload()));
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.run', () => this.treeDataProvider.runTest()));
+        context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.runAll', () => this.treeDataProvider.runAllTests()));
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.debug', () => this.treeDataProvider.debugTest()));
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.setCurrent', (item: TestNode) => this.treeDataProvider.current = item));
     }
