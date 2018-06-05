@@ -20,10 +20,15 @@
     },
     "license": "SEE LICENSE IN License.txt",
     "categories": [
-        "Programming Languages", "Debuggers", "Other"
+        "Programming Languages",
+        "Debuggers",
+        "Other"
     ],
     "keywords": [
-        "Testing", "Unit Tests", "GTest", "C++"
+        "Testing",
+        "Unit Tests",
+        "GTest",
+        "C++"
     ],
     "icon": "images/icon.png",
     "galleryBanner": {
@@ -39,10 +44,10 @@
             {
                 "command": "gtestExplorer.refresh",
                 "title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}                
+                "icon": {
+                    "light": "resources/light/refresh.svg",
+                    "dark": "resources/dark/refresh.svg"
+                }
             },
             {
                 "command": "gtestExplorer.run",
@@ -55,7 +60,7 @@
             {
                 "command": "gtestExplorer.debug",
                 "title": "Debug",
-                "icon":{
+                "icon": {
                     "dark": "resources/debug.png",
                     "light": "resources/debug.png"
                 }
@@ -70,7 +75,7 @@
                 "icon": {
                     "light": "resources/runAll.svg",
                     "dark": "resources/runAll.svg"
-                }                
+                }
             },
             {
                 "command": "gtestExplorer.stop",
@@ -78,7 +83,7 @@
                 "icon": {
                     "light": "resources/stop.svg",
                     "dark": "resources/stop.svg"
-                }                                
+                }
             }
         ],
         "menus": {
@@ -134,9 +139,9 @@
         "views": {
             "explorer": [
                 {
-					"id": "gtestExplorer",
-					"name": "Test Explorer"
-				}                
+                    "id": "gtestExplorer",
+                    "name": "Test Explorer"
+                }
             ]
         }
     },
