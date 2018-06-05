@@ -7,9 +7,29 @@
     "engines": {
         "vscode": "^1.23.0"
     },
+    "author": {
+        "name": "David Schuldenfrei"
+    },
+    "homepage": "https://github.com/DavidSchuldenfrei/gtest-adapter/blob/master/README.md",
+    "bugs": {
+        "url": "https://github.com/DavidSchuldenfrei/gtest-adapter/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DavidSchuldenfrei/gtest-adapter"
+    },
+    "license": "SEE LICENSE IN License.txt",
     "categories": [
-        "Other"
+        "Programming Languages", "Debuggers", "Other"
     ],
+    "keywords": [
+        "Testing", "Unit Tests", "GTest", "C++"
+    ],
+    "icon": "images/icon.png",
+    "galleryBanner": {
+        "color": "#a5d2ff",
+        "theme": "light"
+    },
     "activationEvents": [
         "onView:gtestExplorer"
     ],
