@@ -3,6 +3,7 @@ import { TestNode, Status } from "./TestNode";
 import { resolve } from "path";
 import { TestTreeItem } from './TestTreeItem';
 import { execSync, spawn, ChildProcess } from "child_process"
+import * as vscode from 'vscode';
 
 export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -42,6 +43,8 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             return this._root.children;
 
         return this.loadTestLines().then((fullNames: string[]) => {
+            if (fullNames.length == 0)
+                return new Array<TestNode>();
             return this.loadTests(fullNames);
         });
     }
@@ -82,8 +85,11 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         this._failedTests = undefined;
 
         this._runStatus = RunStatus.Running;
-        let args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
-        this._runner = spawn(this.getTestsApp(), args, { detached: true, cwd: this.getWorkspaceFolder() });
+        const args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
+        const testApp =this.getTestsApp();
+        if (testApp === '')
+            return;
+        this._runner = spawn(testApp, args, { detached: true, cwd: this.getWorkspaceFolder() });
         this._runner.stdout.on('data', data => {
             var dataStr = '';
             if (typeof (data) == 'string') {
@@ -148,22 +154,23 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     }
 
     private getDebugConfig(): CppDebugConfig | undefined {
-        var debugConfigName = workspace.getConfiguration("gtest-adapter").get<string>("debugConfig");
-        var debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
+        const debugConfigName = workspace.getConfiguration("gtest-adapter").get<string>("debugConfig");
+        const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
         return debugConfigs.find(config => { return config.name == debugConfigName; });
     }
 
     private getWorkspaceFolder(): string {
-        var folders = workspace.workspaceFolders;
+        const folders = workspace.workspaceFolders;
         if (!folders || folders.length == 0)
             return '';
-        var uri = folders[0].uri;
+        const uri = folders[0].uri;
         return uri.fsPath;
     }
 
     private getTestsApp(): string {
         var debugConfig = this.getDebugConfig();
         if (!debugConfig) {
+            vscode.window.showErrorMessage(`gtest-adapter.debugConfig isn't configured - Can't load tests`);
             return '';
         }
         var workspaceFolder = this.getWorkspaceFolder();
@@ -174,6 +181,9 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
 
     private loadTestLines(): Thenable<string[]> {
         return new Promise((c, e) => {
+            const testApp = this.getTestsApp() ;
+            if (testApp === '')
+                return c([]);
             var results = execSync(this.getTestsApp() + '  --gtest_list_tests', { encoding: "utf8" })
                 .split(/[\r\n]+/g);
             results = results.filter(s => s != null && s.trim() != "");
