@@ -1,8 +1,8 @@
-import { EventEmitter, TreeDataProvider, TreeItem, Event, DebugConfiguration, ExtensionContext, workspace, debug } from 'vscode';
+import { EventEmitter, TreeDataProvider, TreeItem, Event, DebugConfiguration, ExtensionContext, workspace, debug, window, StatusBarItem } from 'vscode';
 import { TestNode, Status } from "./TestNode";
-import {resolve } from "path";
+import { resolve } from "path";
 import { TestTreeItem } from './TestTreeItem';
-import { execSync, spawn } from "child_process"
+import { execSync, spawn, ChildProcess } from "child_process"
 
 export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -10,14 +10,23 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _current: TestNode | undefined;
     private _root: TestNode | undefined;
     private _leaves: any;
+    private _passedTests: number | undefined;
+    private _failedTests: number | undefined;
+    private _runStatus: RunStatus;
+    private _statusBar: StatusBarItem;
+    private _runner: ChildProcess | undefined;
 
     constructor(private readonly context: ExtensionContext) {
         this._leaves = {};
+        this._statusBar = window.createStatusBarItem();
+        this._runStatus = RunStatus.None;
     }
 
     public reload(): any {
         this._root = undefined;
         this._leaves = {};
+        this._passedTests = undefined;
+        this._failedTests = undefined;
         this.refresh();
     }
 
@@ -30,7 +39,7 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             return element.children;
         }
         if (this._root)
-            return [this._root];
+            return this._root.children;
 
         return this.loadTestLines().then((fullNames: string[]) => {
             return this.loadTests(fullNames);
@@ -58,10 +67,24 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         }
     }
 
+    public stopRun() {
+        if (this._runner)
+            this._runner.kill();
+        this._runStatus = RunStatus.RunCompleted;
+        if (this._root)
+            this._root.RefreshStatus();
+        this.refresh();
+    }
+
     private runTestByName(testName: string) {
+        this.stopRun();
+        this._passedTests = undefined;
+        this._failedTests = undefined;
+
+        this._runStatus = RunStatus.Running;
         let args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
-        var runner = spawn(this.getTestsApp(), args, { detached: true, cwd: this.getWorkspaceFolder() });
-        runner.stdout.on('data', data => {
+        this._runner = spawn(this.getTestsApp(), args, { detached: true, cwd: this.getWorkspaceFolder() });
+        this._runner.stdout.on('data', data => {
             var dataStr = '';
             if (typeof (data) == 'string') {
                 dataStr = data as string;
@@ -75,19 +98,28 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
                     if (node) {
                         node.status = Status.Passed;
                     }
+                    if (!this._passedTests)
+                        this._passedTests = 0;
+                    this._passedTests++;
                 } else if (line.startsWith('[  FAILED  ]')) {
                     var node = this.findNode(TestTreeDataProvider.getTestName(line));
                     if (node) {
                         node.status = Status.Failed;
                     }
+                    if (!this._failedTests)
+                        this._failedTests = 0;
+                    this._failedTests++;
                 }
             });
             this.refresh();
         });
-        runner.on('exit', code => {
-            if (this._root)
-                this._root.RefreshStatus();
-            this.refresh();
+        this._runner.on('exit', code => {
+            if (code !== null) { //Allows to not handle case when run was stopped
+                if (this._root)
+                    this._root.RefreshStatus();
+                this._runStatus = RunStatus.RunCompleted;
+                this.refresh();
+            }
         });
         if (this._root)
             this._root.RefreshStatus();
@@ -104,6 +136,7 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
 
     private refresh(): any {
         this._onDidChangeTreeData.fire();
+        this.refreshStatusBar();
     }
 
     private findNode(nodeName: string): TestNode | undefined {
@@ -184,9 +217,34 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             this._leaves[node.fullName] = node;
         }
     }
+
+    private refreshStatusBar() {
+        if (this._runStatus == RunStatus.None) {
+            this._statusBar.hide();
+        } else {
+            var text = '';
+            if (this._runStatus == RunStatus.Running) {
+                text = 'Running ';
+            } else {
+                text = 'Last Run ';
+            }
+            if (this._passedTests) {
+                text = text + 'Passed ' + (this._passedTests);
+            }
+            if (this._failedTests) {
+                text = text + 'Failed ' + (this._failedTests);
+            }
+            this._statusBar.text = text;
+            this._statusBar.show();
+        }
+
+    }
+
 }
 
 interface CppDebugConfig extends DebugConfiguration {
     program: string;
     args?: string[];
 }
+
+enum RunStatus { None, Running, RunCompleted }

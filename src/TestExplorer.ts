@@ -16,6 +16,7 @@ export class TestExplorer {
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.run', () => this.treeDataProvider.runTest()));
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.runAll', () => this.treeDataProvider.runAllTests()));
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.debug', () => this.treeDataProvider.debugTest()));
+        context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.stop', () => this.treeDataProvider.stopRun()));
         context.subscriptions.push(vscode.commands.registerCommand('gtestExplorer.setCurrent', (item: TestNode) => this.treeDataProvider.current = item));
     }
 }

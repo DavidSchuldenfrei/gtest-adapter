@@ -51,6 +51,14 @@
                     "light": "resources/runAll.svg",
                     "dark": "resources/runAll.svg"
                 }                
+            },
+            {
+                "command": "gtestExplorer.stop",
+                "title": "Stop",
+                "icon": {
+                    "light": "resources/stop.svg",
+                    "dark": "resources/stop.svg"
+                }                                
             }
         ],
         "menus": {
@@ -58,10 +66,15 @@
                 {
                     "command": "gtestExplorer.refresh",
                     "when": "view == gtestExplorer",
-                    "group": "navigation@3"
+                    "group": "navigation@4"
                 },
                 {
                     "command": "gtestExplorer.debug",
+                    "when": "view == gtestExplorer",
+                    "group": "navigation@3"
+                },
+                {
+                    "command": "gtestExplorer.stop",
                     "when": "view == gtestExplorer",
                     "group": "navigation@2"
                 },
