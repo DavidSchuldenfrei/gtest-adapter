@@ -10,8 +10,8 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _current: TestNode | undefined;
     private _root: TestNode | undefined;
     private _leaves: any;
-    private _passedTests: number | undefined;
-    private _failedTests: number | undefined;
+    private _passedTests: number;
+    private _failedTests: number;
     private _runStatus: RunStatus;
     private _statusBar: StatusBarItem;
     private _runner: ChildProcess | undefined;
@@ -20,13 +20,15 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         this._leaves = {};
         this._statusBar = window.createStatusBarItem();
         this._runStatus = RunStatus.None;
+        this._passedTests = 0;
+        this._failedTests = 0;
     }
 
     public reload(): any {
         this._root = undefined;
         this._leaves = {};
-        this._passedTests = undefined;
-        this._failedTests = undefined;
+        this._passedTests = 0;
+        this._failedTests = 0;
         this.refresh();
     }
 
@@ -80,8 +82,8 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
 
     private runTestByName(testName: string) {
         this.stopRun();
-        this._passedTests = undefined;
-        this._failedTests = undefined;
+        this._passedTests = 0;
+        this._failedTests = 0;
 
         this._runStatus = RunStatus.Running;
         const args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
@@ -237,18 +239,11 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             } else {
                 text = 'Last Run ';
             }
-            if (this._passedTests) {
-                text = text + 'Passed ' + (this._passedTests);
-            }
-            if (this._failedTests) {
-                text = text + 'Failed ' + (this._failedTests);
-            }
+            text = text + 'Passed ' + (this._passedTests) + '/' + (this._passedTests + this._failedTests);
             this._statusBar.text = text;
             this._statusBar.show();
         }
-
     }
-
 }
 
 interface CppDebugConfig extends DebugConfiguration {

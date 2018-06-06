@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GTest Adapter",
     "description": "Easily run GTests from VsCode",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.23.0"
@@ -50,7 +50,9 @@
                 "icon": {
                     "light": "resources/light/refresh.svg",
                     "dark": "resources/dark/refresh.svg"
-                }
+                },
+                "category": "GTest"
+                
             },
             {
                 "command": "gtestExplorer.run",
@@ -58,7 +60,8 @@
                 "icon": {
                     "light": "resources/run.svg",
                     "dark": "resources/run.svg"
-                }
+                },
+                "category": "GTest"
             },
             {
                 "command": "gtestExplorer.debug",
@@ -66,7 +69,8 @@
                 "icon": {
                     "dark": "resources/debug.png",
                     "light": "resources/debug.png"
-                }
+                },
+                "category": "GTest"
             },
             {
                 "command": "gtestExplorer.setCurrent",
@@ -78,7 +82,8 @@
                 "icon": {
                     "light": "resources/runAll.svg",
                     "dark": "resources/runAll.svg"
-                }
+                },
+                "category": "GTest"
             },
             {
                 "command": "gtestExplorer.stop",
@@ -86,7 +91,14 @@
                 "icon": {
                     "light": "resources/stop.svg",
                     "dark": "resources/stop.svg"
-                }
+                },
+                "category": "GTest"
+            }
+        ],
+        "keybindings":[
+            {
+                "command": "gtestExplorer.runAll",
+                "key": "alt+ctrl+r alt+ctrl+a"
             }
         ],
         "menus": {
