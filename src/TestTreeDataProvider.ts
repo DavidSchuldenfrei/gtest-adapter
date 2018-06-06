@@ -3,7 +3,6 @@ import { TestNode, Status } from "./TestNode";
 import { resolve } from "path";
 import { TestTreeItem } from './TestTreeItem';
 import { execSync, spawn, ChildProcess } from "child_process"
-import * as vscode from 'vscode';
 
 export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -170,7 +169,7 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private getTestsApp(): string {
         var debugConfig = this.getDebugConfig();
         if (!debugConfig) {
-            vscode.window.showErrorMessage(`gtest-adapter.debugConfig isn't configured - Can't load tests`);
+            window.showErrorMessage(`gtest-adapter.debugConfig isn't configured - Can't load tests`);
             return '';
         }
         var workspaceFolder = this.getWorkspaceFolder();
