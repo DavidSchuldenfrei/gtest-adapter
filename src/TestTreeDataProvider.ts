@@ -1,4 +1,4 @@
-import { EventEmitter, TreeDataProvider, TreeItem, Event, DebugConfiguration, ExtensionContext, workspace, debug, window, StatusBarItem } from 'vscode';
+import { EventEmitter, TreeDataProvider, TreeItem, Event, DebugConfiguration, ExtensionContext, workspace, debug, window, StatusBarItem, ConfigurationTarget } from 'vscode';
 import { TestNode, Status } from "./TestNode";
 import { resolve } from "path";
 import { TestTreeItem } from './TestTreeItem';
@@ -171,9 +171,24 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private getTestsApp(): string {
         var debugConfig = this.getDebugConfig();
         if (!debugConfig) {
-            window.showErrorMessage(`gtest-adapter.debugConfig isn't configured - Can't load tests`);
+            const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
+            if (debugConfigs.length == 0) {
+                window.showErrorMessage(`You first need to define a debug configuration, for your tests`);
+            } else {
+                var options: string[] = [];
+                debugConfigs.forEach(s => options.push(s.name));
+                window.showErrorMessage(`You first need to select a debug configuration, for your tests`, ...options)
+                    .then(s => {
+                        if (s) {
+                            workspace.getConfiguration().update("gtest-adapter.debugConfig", s, ConfigurationTarget.Workspace);
+                        }
+                    });
+            }
+        }
+        if (!debugConfig) {
             return '';
         }
+
         var workspaceFolder = this.getWorkspaceFolder();
         var testConfig = debugConfig.program;
         testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder)
