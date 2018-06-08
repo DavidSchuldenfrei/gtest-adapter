@@ -2,7 +2,8 @@ import { EventEmitter, TreeDataProvider, TreeItem, Event, DebugConfiguration, Ex
 import { TestNode, Status } from "./TestNode";
 import { resolve } from "path";
 import { TestTreeItem } from './TestTreeItem';
-import { execSync, spawn, ChildProcess } from "child_process"
+import { execSync, spawn, ChildProcess } from "child_process";
+import { existsSync } from "fs";
 
 export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -177,7 +178,12 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         var workspaceFolder = this.getWorkspaceFolder();
         var testConfig = debugConfig.program;
         testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder)
-        return resolve(workspaceFolder, testConfig);
+        const testApp = resolve(workspaceFolder, testConfig);
+        if (!existsSync(testApp)) {
+            window.showErrorMessage("You need to first build the unit test app");
+            return '';
+        }
+        return testApp;
     }
 
     private loadTestLines(): Thenable<string[]> {
@@ -185,7 +191,7 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             const testApp = this.getTestsApp() ;
             if (testApp === '')
                 return c([]);
-            var results = execSync(this.getTestsApp() + '  --gtest_list_tests', { encoding: "utf8" })
+            var results = execSync(testApp + '  --gtest_list_tests', { encoding: "utf8" })
                 .split(/[\r\n]+/g);
             results = results.filter(s => s != null && s.trim() != "");
             c(results);
