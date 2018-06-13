@@ -192,7 +192,8 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
 
         var workspaceFolder = this.getWorkspaceFolder();
         var testConfig = debugConfig.program;
-        testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder)
+        testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder);
+        testConfig = testConfig.replace("${workspaceRoot}", workspaceFolder); //Deprecated but might still be used.
         const testApp = resolve(workspaceFolder, testConfig);
         if (!existsSync(testApp)) {
             window.showErrorMessage("You need to first build the unit test app");
