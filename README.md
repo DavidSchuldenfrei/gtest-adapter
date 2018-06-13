@@ -22,14 +22,18 @@ This extension contributes the following settings:
 
 ### 1.0.0
 
-Initial release of GTest Adapter
+Initial release of GTest Adapter.
 
 # 1.0.1
 
-Minor tweaks
+Minor tweaks.
 
 #1.0.2
 
-Allows to pick a debug config if no config found.
-Better error messages
+* Allows to pick a debug config if no config found.
+* Better error messages.
 
+#1.0.3
+
+* Warns if project was never build.
+* Supports workspaceRoot as well as workspaceFolder in launch.json (although obsolete, might be in legacy configurations).
