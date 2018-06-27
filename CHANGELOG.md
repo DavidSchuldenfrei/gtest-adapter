@@ -10,3 +10,20 @@ All notable changes to the "gtest-adapter" extension will be documented in this 
 - Improved Icon
 - Added keyboard shortcut for RUn All Tests
 - Prettier status bar
+
+## [1.0.2]
+
+- Allows to pick a debug config if no config found.
+- Better error messages.
+
+## [1.0.3]
+
+- Warns if project was never build.
+- Supports workspaceRoot as well as workspaceFolder in launch.json (although obsolete, might be in legacy configurations).
+
+## [1.0.4]
+
+- Refactored.
+- Better status bar.
+- Allows to switch debug configurations
+- Prettier README.md

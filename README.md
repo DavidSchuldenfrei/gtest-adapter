@@ -6,6 +6,8 @@ Allows viewing all GTests in a tree view, and running/debugging them.
 
 This extension presents all GTests in your application in a tree view. The developper can then run/debug any of these tests.
 
+![Show GTest Adapter](/images/Demo.gif)
+
 ## Extension Settings
 
 This extension contributes the following settings:
@@ -37,3 +39,10 @@ Minor tweaks.
 
 * Warns if project was never build.
 * Supports workspaceRoot as well as workspaceFolder in launch.json (although obsolete, might be in legacy configurations).
+
+#1.0.4
+
+* Refactored.
+* Better status bar.
+* Allows to switch debug configurations
+* Prettier README.md
