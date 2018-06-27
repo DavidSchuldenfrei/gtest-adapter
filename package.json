@@ -93,6 +93,15 @@
                     "dark": "resources/stop.svg"
                 },
                 "category": "GTest"
+            },
+            {
+                "command": "gtestExplorer.switchConfig",
+                "title": "Switch Test Configuration",
+                "icon": {
+                    "light": "resources/light/switch.svg",
+                    "dark": "resources/dark/switch.svg"
+                },
+                "category": "GTest"
             }
         ],
         "keybindings":[
@@ -103,6 +112,11 @@
         ],
         "menus": {
             "view/title": [
+                {
+                    "command": "gtestExplorer.switchConfig",
+                    "when": "view == gtestExplorer",
+                    "group": "navigation@5"
+                },
                 {
                     "command": "gtestExplorer.refresh",
                     "when": "view == gtestExplorer",
@@ -146,7 +160,6 @@
             "properties": {
                 "gtest-adapter.debugConfig": {
                     "type": "string",
-                    "default": "(Windows) Launch",
                     "description": "Debug configuration for debugging unittests."
                 }
             }

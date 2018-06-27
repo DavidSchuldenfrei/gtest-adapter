@@ -1,9 +1,7 @@
-import { EventEmitter, TreeDataProvider, TreeItem, Event, DebugConfiguration, ExtensionContext, workspace, debug, window, StatusBarItem, ConfigurationTarget } from 'vscode';
+import { EventEmitter, TreeDataProvider, TreeItem, Event, ExtensionContext } from 'vscode';
 import { TestNode, Status } from "./TestNode";
-import { resolve } from "path";
 import { TestTreeItem } from './TestTreeItem';
-import { execSync, spawn, ChildProcess } from "child_process";
-import { existsSync } from "fs";
+import { Controller } from './Controller';
 
 export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -11,25 +9,14 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _current: TestNode | undefined;
     private _root: TestNode | undefined;
     private _leaves: any;
-    private _passedTests: number;
-    private _failedTests: number;
-    private _runStatus: RunStatus;
-    private _statusBar: StatusBarItem;
-    private _runner: ChildProcess | undefined;
 
-    constructor(private readonly context: ExtensionContext) {
+    constructor(private readonly context: ExtensionContext, private controller: Controller) {
         this._leaves = {};
-        this._statusBar = window.createStatusBarItem();
-        this._runStatus = RunStatus.None;
-        this._passedTests = 0;
-        this._failedTests = 0;
     }
 
     public reload(): any {
         this._root = undefined;
         this._leaves = {};
-        this._passedTests = 0;
-        this._failedTests = 0;
         this.refresh();
     }
 
@@ -44,10 +31,14 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         if (this._root)
             return this._root.children;
 
-        return this.loadTestLines().then((fullNames: string[]) => {
-            if (fullNames.length == 0)
+        return this.controller.loadTestsRoot().then(root => {
+            if (!root) {
                 return new Array<TestNode>();
-            return this.loadTests(fullNames);
+            } else {
+                this._root = root;
+                this.registerLeaves(root);
+                return root.children;
+            }
         });
     }
 
@@ -59,188 +50,19 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         this._current = value;
     }
 
-    public runAllTests() {
-        this.runTestByName('*');
-    }
-
-    public runTest() {
-        if (this._current) {
-            const testName = (this._current as TestNode).fullName;
-            this.runTestByName(testName);
-        } else {
-            this.runAllTests();
-        }
-    }
-
-    public stopRun() {
-        if (this._runner)
-            this._runner.kill();
-        this._runStatus = RunStatus.RunCompleted;
+    public refresh() {
         if (this._root)
             this._root.RefreshStatus();
-        this.refresh();
-    }
-
-    private runTestByName(testName: string) {
-        this.stopRun();
-        this._passedTests = 0;
-        this._failedTests = 0;
-
-        this._runStatus = RunStatus.Running;
-        const args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
-        const testApp =this.getTestsApp();
-        if (testApp === '')
-            return;
-        this._runner = spawn(testApp, args, { detached: true, cwd: this.getWorkspaceFolder() });
-        this._runner.stdout.on('data', data => {
-            var dataStr = '';
-            if (typeof (data) == 'string') {
-                dataStr = data as string;
-            } else {
-                dataStr = (data as Buffer).toString();
-            }
-            var lines = dataStr.split(/[\r\n]+/g);
-            lines.forEach(line => {
-                if (line.startsWith('[       OK ]')) {
-                    var node = this.findNode(TestTreeDataProvider.getTestName(line));
-                    if (node) {
-                        node.status = Status.Passed;
-                    }
-                    if (!this._passedTests)
-                        this._passedTests = 0;
-                    this._passedTests++;
-                } else if (line.startsWith('[  FAILED  ]')) {
-                    var node = this.findNode(TestTreeDataProvider.getTestName(line));
-                    if (node) {
-                        node.status = Status.Failed;
-                    }
-                    if (!this._failedTests)
-                        this._failedTests = 0;
-                    this._failedTests++;
-                }
-            });
-            this.refresh();
-        });
-        this._runner.on('exit', code => {
-            if (code !== null) { //Allows to not handle case when run was stopped
-                if (this._root)
-                    this._root.RefreshStatus();
-                this._runStatus = RunStatus.RunCompleted;
-                this.refresh();
-            }
-        });
-        if (this._root)
-            this._root.RefreshStatus();
-        this.refresh();
-    }
-
-    public debugTest() {
-        var debugConfig = this.getDebugConfig();
-        if (this._current && workspace.workspaceFolders && debugConfig) {
-            debugConfig.args = ['--gtest_filter=' + this._current.fullName];
-            debug.startDebugging(workspace.workspaceFolders[0], debugConfig);
-        }
-    }
-
-    private refresh(): any {
         this._onDidChangeTreeData.fire();
-        this.refreshStatusBar();
+    }
+
+    public setTestStatus(testName: string, testStatus: Status) {
+        var node = this.findNode(testName);
+        node && (node.status = testStatus);
     }
 
     private findNode(nodeName: string): TestNode | undefined {
         return this._leaves[nodeName];
-    }
-
-    private static getTestName(lineResult: string): string {
-        return lineResult.substring(12).trim().split(' ')[0].replace(',', '');
-    }
-
-    private getDebugConfig(): CppDebugConfig | undefined {
-        const debugConfigName = workspace.getConfiguration("gtest-adapter").get<string>("debugConfig");
-        const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
-        return debugConfigs.find(config => { return config.name == debugConfigName; });
-    }
-
-    private getWorkspaceFolder(): string {
-        const folders = workspace.workspaceFolders;
-        if (!folders || folders.length == 0)
-            return '';
-        const uri = folders[0].uri;
-        return uri.fsPath;
-    }
-
-    private getTestsApp(): string {
-        var debugConfig = this.getDebugConfig();
-        if (!debugConfig) {
-            const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
-            if (debugConfigs.length == 0) {
-                window.showErrorMessage(`You first need to define a debug configuration, for your tests`);
-            } else {
-                var options: string[] = [];
-                debugConfigs.forEach(s => options.push(s.name));
-                window.showErrorMessage(`You first need to select a debug configuration, for your tests`, ...options)
-                    .then(s => {
-                        if (s) {
-                            workspace.getConfiguration().update("gtest-adapter.debugConfig", s, ConfigurationTarget.Workspace);
-                        }
-                    });
-            }
-        }
-        if (!debugConfig) {
-            return '';
-        }
-
-        var workspaceFolder = this.getWorkspaceFolder();
-        var testConfig = debugConfig.program;
-        testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder);
-        testConfig = testConfig.replace("${workspaceRoot}", workspaceFolder); //Deprecated but might still be used.
-        const testApp = resolve(workspaceFolder, testConfig);
-        if (!existsSync(testApp)) {
-            window.showErrorMessage("You need to first build the unit test app");
-            return '';
-        }
-        return testApp;
-    }
-
-    private loadTestLines(): Thenable<string[]> {
-        return new Promise((c, e) => {
-            const testApp = this.getTestsApp() ;
-            if (testApp === '')
-                return c([]);
-            var results = execSync(testApp + '  --gtest_list_tests', { encoding: "utf8" })
-                .split(/[\r\n]+/g);
-            results = results.filter(s => s != null && s.trim() != "");
-            c(results);
-            return c([]);
-        });
-    }
-
-    private loadTests(tests: string[]): TestNode[] {
-        this._root = new TestNode("", "Tests")
-        var current = this._root;
-        var currentName = "";
-        for (var i = 0; i < tests.length; ++i) {
-            var currentTestLine = tests[i];
-            if (currentTestLine.startsWith(" ")) {
-                current.addChild(new TestNode(currentName, currentTestLine));
-            } else {
-                var indexOfSlash = currentTestLine.indexOf("/");
-                if (indexOfSlash > 0) {
-                    var startOfLine = currentTestLine.substring(0, indexOfSlash + 1);
-                    var first = new TestNode("", startOfLine);
-                    var firstNode = this._root.addChild(first);
-                    var second = new TestNode(startOfLine, currentTestLine.substring(indexOfSlash + 1));
-                    current = firstNode.addChild(second);
-                    currentName = currentTestLine;
-                } else {
-                    var node = new TestNode("", currentTestLine);
-                    current = this._root.addChild(node);
-                    currentName = currentTestLine;
-                }
-            }
-        }
-        this.registerLeaves(this._root);
-        return this._root.children;
     }
 
     private registerLeaves(node: TestNode) {
@@ -250,27 +72,4 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             this._leaves[node.fullName] = node;
         }
     }
-
-    private refreshStatusBar() {
-        if (this._runStatus == RunStatus.None) {
-            this._statusBar.hide();
-        } else {
-            var text = '';
-            if (this._runStatus == RunStatus.Running) {
-                text = 'Running ';
-            } else {
-                text = 'Last Run ';
-            }
-            text = text + 'Passed ' + (this._passedTests) + '/' + (this._passedTests + this._failedTests);
-            this._statusBar.text = text;
-            this._statusBar.show();
-        }
-    }
 }
-
-interface CppDebugConfig extends DebugConfiguration {
-    program: string;
-    args?: string[];
-}
-
-enum RunStatus { None, Running, RunCompleted }
