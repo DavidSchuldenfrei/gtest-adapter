@@ -5,7 +5,7 @@
     "version": "1.0.3",
     "publisher": "DavidSchuldenfrei",
     "engines": {
-        "vscode": "^1.23.0"
+        "vscode": "^1.24.1"
     },
     "author": {
         "name": "David Schuldenfrei"
@@ -52,7 +52,6 @@
                     "dark": "resources/dark/refresh.svg"
                 },
                 "category": "GTest"
-                
             },
             {
                 "command": "gtestExplorer.run",
@@ -71,10 +70,6 @@
                     "light": "resources/debug.png"
                 },
                 "category": "GTest"
-            },
-            {
-                "command": "gtestExplorer.setCurrent",
-                "title": "_"
             },
             {
                 "command": "gtestExplorer.runAll",
@@ -104,7 +99,7 @@
                 "category": "GTest"
             }
         ],
-        "keybindings":[
+        "keybindings": [
             {
                 "command": "gtestExplorer.runAll",
                 "key": "alt+ctrl+r alt+ctrl+a"

@@ -1,6 +1,6 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands } from "vscode";
+import { ExtensionContext, window, commands, TreeView } from "vscode";
 import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
@@ -10,13 +10,14 @@ export class Controller {
     private _currentTestName = "*";
     private _tree: TestTreeDataProvider;
     private _statusBar: StatusBar;
+    private _treeView: TreeView<TestNode>;
 
     constructor(context: ExtensionContext) {
         this._gtestWrapper = new GTestWrapper(this);
         this._tree = new TestTreeDataProvider(context, this);
         this._statusBar = new StatusBar();
 
-        window.createTreeView('gtestExplorer', { treeDataProvider : this._tree});
+        this._treeView = window.createTreeView('gtestExplorer', { treeDataProvider : this._tree});
 
         context.subscriptions.push(commands.registerCommand('gtestExplorer.refresh', () => this.reloadAll()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.run', () => this.runCurrentTest()));
@@ -25,7 +26,6 @@ export class Controller {
         context.subscriptions.push(commands.registerCommand('gtestExplorer.stop', () => this.stopRun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.rerun', () => this.rerun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.switchConfig', () => this.switchConfig()));
-        context.subscriptions.push(commands.registerCommand('gtestExplorer.setCurrent', (item: TestNode) => this._tree.current = item));
     }
 
     public reloadAll() {
@@ -73,9 +73,9 @@ export class Controller {
     }
 
     private getCurrentTestName() {
-        var node = this._tree.current;
-        if (node) {
-            return node.fullName;
+        var nodes = this._treeView.selection;
+        if (nodes.length > 0) {
+            return nodes[0].fullName;
         } else {
             return "*";
         }

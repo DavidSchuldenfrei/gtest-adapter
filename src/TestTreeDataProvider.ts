@@ -6,7 +6,6 @@ import { Controller } from './Controller';
 export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
     readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
-    private _current: TestNode | undefined;
     private _root: TestNode | undefined;
     private _leaves: any;
 
@@ -40,14 +39,6 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
                 return root.children;
             }
         });
-    }
-
-    public get current(): TestNode | undefined {
-        return this._current;
-    }
-
-    public set current(value: TestNode | undefined) {
-        this._current = value;
     }
 
     public refresh() {
