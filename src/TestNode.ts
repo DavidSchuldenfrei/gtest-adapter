@@ -53,7 +53,7 @@ export class TestNode {
 
     public get fullName(): string {
         if (this.isFolder) {
-            var parts = this._fullnames;
+            var parts = this._fullnames.slice();
             parts.forEach((fn, i, arr) => { arr[i] = fn + "*" });
             return parts.join(':');
         } else {
@@ -67,7 +67,7 @@ export class TestNode {
 
     public get children(): TestNode[] {
         var result: TestNode[] = [];
-        Object.keys(this._children).forEach((key) => result.push(this._children[key] as TestNode));
+        Object.keys(this._children).forEach(key => result.push(this._children[key] as TestNode));
         result.sort((a, b) => a.name.localeCompare(b.name));
         return result;
     }
@@ -84,5 +84,13 @@ export class TestNode {
         }
         this._children[child.name] = child;
         return child;
+    }
+
+    public clearChildrenStatus() {
+        Object.keys(this._children).forEach(key => {
+            var child = this._children[key] as TestNode;
+            child.status = Status.Unknown;
+            child.clearChildrenStatus();
+        });
     }
 }

@@ -22,6 +22,12 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 1.0.5
+
+* Uses the "Test" activity instead of the "Explorer" activity
+* Switches to debug activity view when debugging tests
+* Clears tree icons when rerunning tests
+
 ### 1.0.4
 
 * Refactored.

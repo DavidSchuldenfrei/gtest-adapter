@@ -47,13 +47,30 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         this._onDidChangeTreeData.fire();
     }
 
+    public clearResults(node: TestNode | undefined) {
+        if (node) {
+            this.clearNodeResults(node);
+        } else if (this._root) {
+            this.clearNodeResults(this._root);
+        }
+        this.refresh();
+    }
+
     public setTestStatus(testName: string, testStatus: Status) {
         var node = this.findNode(testName);
         node && (node.status = testStatus);
     }
 
     private findNode(nodeName: string): TestNode | undefined {
+        if (nodeName == '*') {
+            return this._root;
+        }
         return this._leaves[nodeName];
+    }
+
+    private clearNodeResults(node: TestNode) {
+        node.status = Status.Unknown;
+        node.clearChildrenStatus();
     }
 
     private registerLeaves(node: TestNode) {

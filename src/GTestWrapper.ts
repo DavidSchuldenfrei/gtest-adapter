@@ -1,4 +1,4 @@
-import { DebugConfiguration,workspace, debug, window, ConfigurationTarget } from 'vscode';
+import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget } from 'vscode';
 import { ChildProcess, spawn, execSync } from 'child_process';
 import { Controller } from './Controller';
 import { existsSync } from 'fs';
@@ -25,7 +25,10 @@ export class GTestWrapper {
         this.stopRun();
         this._passedTests = 0;
         this._failedTests = 0;
+        setTimeout(() => this.realRunTestByName(testName), 500); //Adding this timeout allows time to clear tree icons
+    }
 
+    private realRunTestByName(testName: string) {
         const args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
         const testApp =this.getTestsApp();
         if (testApp === '')
@@ -63,6 +66,7 @@ export class GTestWrapper {
         if (workspace.workspaceFolders && debugConfig) {
             debugConfig.args = ['--gtest_filter=' + testName];
             debug.startDebugging(workspace.workspaceFolders[0], debugConfig);
+            commands.executeCommand('workbench.view.debug');
         }
     }
 

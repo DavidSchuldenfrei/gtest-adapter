@@ -8,6 +8,7 @@ import { RunStatus } from "./RunStatus";
 export class Controller {
     private _gtestWrapper: GTestWrapper;
     private _currentTestName = "*";
+    private _currentNode: TestNode | undefined;
     private _tree: TestTreeDataProvider;
     private _statusBar: StatusBar;
     private _treeView: TreeView<TestNode>;
@@ -48,15 +49,19 @@ export class Controller {
 
     private runAllTests() {
         this._currentTestName = "*";
+        this._currentNode = undefined;
+        this._tree.clearResults(this._currentNode);
         this._gtestWrapper.runAllTests();
     }
 
     private runCurrentTest() {
-        this._currentTestName = this.getCurrentTestName();
+        this.initCurrent();
+        this._tree.clearResults(this._currentNode);
         this._gtestWrapper.runTestByName(this._currentTestName);
     }
 
     private rerun() {
+        this._tree.clearResults(this._currentNode);
         this._gtestWrapper.runTestByName(this._currentTestName);
     }
 
@@ -65,19 +70,22 @@ export class Controller {
     }
 
     private debugTest() {
-        this._gtestWrapper.debugTest(this.getCurrentTestName());
+        this.initCurrent();
+        this._gtestWrapper.debugTest(this._currentTestName);
     }
 
     private switchConfig() {
         this._gtestWrapper.switchConfig();
     }
 
-    private getCurrentTestName() {
+    private initCurrent() {
         var nodes = this._treeView.selection;
         if (nodes.length > 0) {
-            return nodes[0].fullName;
+            this._currentTestName = nodes[0].fullName;
+            this._currentNode = nodes[0];
         } else {
-            return "*";
+            this._currentTestName = "*";
+            this._currentNode = undefined;
         }
     }
 }
