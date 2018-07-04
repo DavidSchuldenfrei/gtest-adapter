@@ -22,27 +22,27 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-### 1.0.0
-
-Initial release of GTest Adapter.
-
-# 1.0.1
-
-Minor tweaks.
-
-#1.0.2
-
-* Allows the user to pick a debug config if no config found.
-* Better error messages.
-
-#1.0.3
-
-* Warns the iser if the project was never built.
-* Supports workspaceRoot as well as workspaceFolder in launch.json (although obsolete, might be in legacy configurations).
-
-#1.0.4
+### 1.0.4
 
 * Refactored.
 * Better status bar.
 * Allows to switch debug configurations
 * Prettier README.md
+
+### 1.0.3
+
+* Warns the user if the project was never built.
+* Supports workspaceRoot as well as workspaceFolder in launch.json (although obsolete, might be in legacy configurations).
+
+### 1.0.2
+
+* Allows the user to pick a debug config if no config found.
+* Better error messages.
+
+### 1.0.1
+
+Minor tweaks.
+
+### 1.0.0
+
+Initial release of GTest Adapter.
