@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GTest Adapter",
     "description": "Easily run GTests from VsCode",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -163,7 +163,7 @@
             "test": [
                 {
                     "id": "gtestExplorer",
-                    "name": "Test Explorer"
+                    "name": "Google Tests"
                 }
             ]
         }
