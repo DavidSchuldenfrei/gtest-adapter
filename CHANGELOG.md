@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.0.6]
+
+* Bug Fix: Takes configuration environment into account when running tests
+* Renamed tree view to Google Tests
+
 ### [1.0.5]
 
 * Uses the "Test" activity instead of the "Explorer" activity
