@@ -30,10 +30,10 @@ export class GTestWrapper {
 
     private realRunTestByName(testName: string) {
         const args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
-        const config = this.getTestsApp();
+        const config = this.getTestsConfig();
         if (!config)
             return;
-        this._runner = spawn(config.program, args, { detached: true, cwd: this.getWorkspaceFolder(), env: config.environment });
+        this._runner = spawn(config.program, args, { detached: true, cwd: this.getWorkspaceFolder(), env: config.env });
         this._runner.stdout.on('data', data => {
             var dataStr = '';
             if (typeof (data) == 'string') {
@@ -104,7 +104,7 @@ export class GTestWrapper {
         return debugConfigs.find(config => { return config.name == debugConfigName; });
     }
 
-    private getTestsApp(): CppDebugConfig | undefined {
+    private getTestsConfig(): TestConfig | undefined {
         var debugConfig = this.getDebugConfig();
         if (!debugConfig) {
             const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
@@ -135,8 +135,17 @@ export class GTestWrapper {
             window.showErrorMessage("You need to first build the unit test app");
             return undefined;
         }
-        debugConfig.program = testApp;
-        return debugConfig;
+        var env = process.env;
+
+        if (debugConfig.environment) {
+            env = JSON.parse(JSON.stringify(process.env));
+            debugConfig.environment.forEach(entry => {
+                if (entry.name != undefined && entry.value != undefined) {
+                    env[entry.name] = entry.value;
+                }
+            });
+        }
+        return new TestConfig(testApp, env);
     }
 
     private getWorkspaceFolder(): string {
@@ -161,10 +170,10 @@ export class GTestWrapper {
 
     private loadTestLines(): Thenable<string[]> {
         return new Promise((c, e) => {
-            const config = this.getTestsApp();
+            const config = this.getTestsConfig();
             if (!config)
-                return c([]);
-            var results = execSync(config.program + '  --gtest_list_tests', { encoding: "utf8", env: config.environment })
+                return c([]);            
+            var results = execSync(config.program + '  --gtest_list_tests', { encoding: "utf8", env: config.env })
                 .split(/[\r\n]+/g);
             results = results.filter(s => s != null && s.trim() != "");
             c(results);
@@ -205,4 +214,9 @@ interface CppDebugConfig extends DebugConfiguration {
     program: string;
     args?: string[];
     environment?:any[];
+}
+
+class TestConfig {
+    constructor (public program: string, public env?: any) {        
+    }
 }
