@@ -97,6 +97,15 @@
                     "dark": "resources/dark/switch.svg"
                 },
                 "category": "GTest"
+            },
+            {
+                "command": "gtestExplorer.search",
+                "title": "Search",
+                "icon": {
+                    "light": "resources/light/search.svg",
+                    "dark": "resources/dark/search.svg"
+                },
+                "category": "GTest"
             }
         ],
         "keybindings": [
@@ -107,6 +116,11 @@
         ],
         "menus": {
             "view/title": [
+                {
+                    "command": "gtestExplorer.search",
+                    "when": "view == gtestExplorer",
+                    "group": "navigation@6"
+                },
                 {
                     "command": "gtestExplorer.switchConfig",
                     "when": "view == gtestExplorer",

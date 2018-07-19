@@ -27,6 +27,7 @@ export class Controller {
         context.subscriptions.push(commands.registerCommand('gtestExplorer.stop', () => this.stopRun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.rerun', () => this.rerun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.switchConfig', () => this.switchConfig()));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.search', () => this.search()));
     }
 
     public reloadAll() {
@@ -86,6 +87,22 @@ export class Controller {
         } else {
             this._currentTestName = "*";
             this._currentNode = undefined;
+        }
+    }
+
+    private async search() {
+        var search = await window.showInputBox(
+            { 
+                prompt: "Please enter a search string", 
+                placeHolder: "Enter (part of) the node to search for. You can use * as a wildcard."
+            });
+        if (search) {
+            var node = this._tree.searchTreeItem(search);
+            if (!node) {
+                window.showWarningMessage("Test not found.")
+            } else {
+                this._treeView.reveal(node);
+            }
         }
     }
 }

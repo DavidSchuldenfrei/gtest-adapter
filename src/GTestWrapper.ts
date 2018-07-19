@@ -182,24 +182,24 @@ export class GTestWrapper {
     }
 
     private loadTestsRoot(tests: string[]): TestNode {
-        var root = new TestNode("", "Tests")
+        var root = new TestNode(undefined, "", "Tests")
         var current = root;
         var currentName = "";
         for (var i = 0; i < tests.length; ++i) {
             var currentTestLine = tests[i];
             if (currentTestLine.startsWith(" ")) {
-                current.addChild(new TestNode(currentName, currentTestLine));
+                current.addChild(new TestNode(current, currentName, currentTestLine));
             } else {
                 var indexOfSlash = currentTestLine.indexOf("/");
                 if (indexOfSlash > 0) {
                     var startOfLine = currentTestLine.substring(0, indexOfSlash + 1);
-                    var first = new TestNode("", startOfLine);
+                    var first = new TestNode(root, "", startOfLine);
                     var firstNode = root.addChild(first);
-                    var second = new TestNode(startOfLine, currentTestLine.substring(indexOfSlash + 1));
+                    var second = new TestNode(firstNode, startOfLine, currentTestLine.substring(indexOfSlash + 1));
                     current = firstNode.addChild(second);
                     currentName = currentTestLine;
                 } else {
-                    var node = new TestNode("", currentTestLine);
+                    var node = new TestNode(root, "", currentTestLine);
                     current = root.addChild(node);
                     currentName = currentTestLine;
                 }
