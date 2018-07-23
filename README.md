@@ -16,11 +16,18 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-* Currently missing a search test functionality in the tree.
 * There is no way to navigate from a tree leaf to the corresponding test.
 
 
 ## Release Notes
+
+### 1.0.8
+
+* Feature: Allows seartching in the test tree
+
+### 1.0.7
+
+* Moved Tree view to Test Activity
 
 ### 1.0.6
 

@@ -2,10 +2,10 @@ export enum Status {Unknown, Passed, Failed}
 export class TestNode {
     private _name: string;
     private _children: any;
-    private _fullnames: string[];;
-    public status: Status
+    private _fullnames: string[];
+    public status: Status;
 
-    constructor(parentPath: string, name: string) {
+    constructor(public parent: TestNode | undefined, parentPath: string, name: string) {
         name = name.trim();
         this._name = this.getname(name);
         var paramPos = name.indexOf("# GetParam() = ");

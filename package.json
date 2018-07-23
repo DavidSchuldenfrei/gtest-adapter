@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GTest Adapter",
     "description": "Easily run GTests from VsCode",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -31,7 +31,8 @@
         "Testing",
         "Unit Tests",
         "GTest",
-        "C++"
+        "C++",
+        "Google-Test"
     ],
     "icon": "images/icon.png",
     "galleryBanner": {
@@ -97,6 +98,15 @@
                     "dark": "resources/dark/switch.svg"
                 },
                 "category": "GTest"
+            },
+            {
+                "command": "gtestExplorer.search",
+                "title": "Search",
+                "icon": {
+                    "light": "resources/light/search.svg",
+                    "dark": "resources/dark/search.svg"
+                },
+                "category": "GTest"
             }
         ],
         "keybindings": [
@@ -107,6 +117,11 @@
         ],
         "menus": {
             "view/title": [
+                {
+                    "command": "gtestExplorer.search",
+                    "when": "view == gtestExplorer",
+                    "group": "navigation@6"
+                },
                 {
                     "command": "gtestExplorer.switchConfig",
                     "when": "view == gtestExplorer",

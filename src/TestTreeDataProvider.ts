@@ -1,4 +1,4 @@
-import { EventEmitter, TreeDataProvider, TreeItem, Event, ExtensionContext } from 'vscode';
+import { EventEmitter, TreeDataProvider, TreeItem, Event, ExtensionContext, ProviderResult } from 'vscode';
 import { TestNode, Status } from "./TestNode";
 import { TestTreeItem } from './TestTreeItem';
 import { Controller } from './Controller';
@@ -21,6 +21,37 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
 
     public getTreeItem(element: TestNode): TreeItem {
         return new TestTreeItem(element, this.context);
+    }
+
+    public getParent(element: TestNode): ProviderResult<TestNode> {
+        return element.parent;
+    }
+
+    public searchTreeItem(searchPattern: string): TestNode | undefined {
+        if (!this._root)
+            return undefined;
+        var escapedPattern = searchPattern.replace('.', '\\.').replace('*', '.*');
+        var regex = new RegExp(escapedPattern,  'i');
+
+        return this.searchInSubTree(this._root, regex);
+    }
+
+    private searchInSubTree(root: TestNode, regex: RegExp): TestNode | undefined {
+        var children = root.children;
+        for (var i = 0; i < children.length; ++i) {
+            if (this.isMatch(children[i], regex)) {
+                return children[i];
+            }
+            var result = this.searchInSubTree(children[i], regex);
+            if (result) {
+                return result;
+            }
+        }
+        return undefined;
+    }
+
+    private isMatch(node: TestNode, regex: RegExp): boolean {
+        return regex.test(node.fullName)
     }
 
     public getChildren(element?: TestNode): TestNode[] | Thenable<TestNode[]> {
