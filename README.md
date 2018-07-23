@@ -27,7 +27,7 @@ This extension contributes the following settings:
 
 ### 1.0.7
 
-* Moved Tree view to Test Activity
+* Bug Fix: Takes configuration environment into account when running tests
 
 ### 1.0.6
 
