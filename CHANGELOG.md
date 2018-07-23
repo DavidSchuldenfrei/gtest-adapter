@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.0.8]
+
+* Feature: Allows searching in the test tree
+
 ### [1.0.7]
 
 * Bug Fix: Takes configuration environment into account when running tests

@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GTest Adapter",
     "description": "Easily run GTests from VsCode",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -31,7 +31,8 @@
         "Testing",
         "Unit Tests",
         "GTest",
-        "C++"
+        "C++",
+        "Google-Test"
     ],
     "icon": "images/icon.png",
     "galleryBanner": {
