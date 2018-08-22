@@ -107,6 +107,11 @@
                     "dark": "resources/dark/search.svg"
                 },
                 "category": "GTest"
+            },
+            {
+                "command": "gtestExplorer.gotoTest",
+                "title": "Goto Test",
+                "category": "GTest"
             }
         ],
         "keybindings": [
@@ -154,6 +159,11 @@
                 }
             ],
             "view/item/context": [
+                {
+                    "command": "gtestExplorer.gotoTest",
+                    "when": "view == gtestExplorer",
+                    "group": "gtestExplorer@2"
+                },
                 {
                     "command": "gtestExplorer.debug",
                     "when": "view == gtestExplorer",
