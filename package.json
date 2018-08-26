@@ -161,7 +161,7 @@
             "view/item/context": [
                 {
                     "command": "gtestExplorer.gotoTest",
-                    "when": "view == gtestExplorer",
+                    "when": "view == gtestExplorer && config.gtest-adapter.supportLocation",
                     "group": "gtestExplorer@2"
                 },
                 {
@@ -181,6 +181,10 @@
                 "gtest-adapter.debugConfig": {
                     "type": "string",
                     "description": "Debug configuration for debugging unittests."
+                },
+                "gtest-adapter.supportLocation": {
+                    "type": "boolean",
+                    "description": "Whether the GoogleTest version being used supports providing for test location."
                 }
             }
         },

@@ -215,6 +215,7 @@ export class GTestWrapper {
             }
         }
         if (existsSync(filename)) {
+            workspace.getConfiguration().update("gtest-adapter.supportLocation", true, ConfigurationTarget.Workspace);
             var workspaceFolder = this.getWorkspaceFolder();
 
             var content = require(filename) as JsonEntry;
@@ -230,6 +231,8 @@ export class GTestWrapper {
             this.fillLeaves(root, locations);
 
             unlinkSync(filename);
+        } else {
+            workspace.getConfiguration().update("gtest-adapter.supportLocation", false, ConfigurationTarget.Workspace);
         }
         return root;
     }
