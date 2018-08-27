@@ -1,6 +1,6 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands, TreeView } from "vscode";
+import { ExtensionContext, window, commands, TreeView, Uri, workspace, Position, Selection, Range } from "vscode";
 import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
@@ -28,6 +28,25 @@ export class Controller {
         context.subscriptions.push(commands.registerCommand('gtestExplorer.rerun', () => this.rerun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.switchConfig', () => this.switchConfig()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.search', () => this.search()));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoTest', () => this.gotoTest()));
+    }
+
+    private gotoTest() {
+        this.initCurrent();
+        if (this._currentNode) {
+            var currentNode = this._currentNode;
+            while (currentNode.children.length) {
+                currentNode = currentNode.children[0];
+            }
+            if (currentNode.location) {
+                var location = currentNode.location;
+                window.showTextDocument(Uri.file(currentNode.location.file)).then(editor => { 
+                    var position = new Position(location.line - 1, 0);
+                    editor.selections = [new Selection(position, position)];
+                    editor.revealRange(new Range(position, position));
+                });
+            }
+        }
     }
 
     public reloadAll() {

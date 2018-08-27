@@ -1,8 +1,8 @@
 {
     "name": "gtest-adapter",
-    "displayName": "GTest Adapter",
-    "description": "Easily run GTests from VsCode",
-    "version": "1.0.8",
+    "displayName": "GoogleTest Adapter",
+    "description": "Easily run GoogleTests from VsCode",
+    "version": "1.1.0",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -107,6 +107,11 @@
                     "dark": "resources/dark/search.svg"
                 },
                 "category": "GTest"
+            },
+            {
+                "command": "gtestExplorer.gotoTest",
+                "title": "Goto Test",
+                "category": "GTest"
             }
         ],
         "keybindings": [
@@ -155,6 +160,11 @@
             ],
             "view/item/context": [
                 {
+                    "command": "gtestExplorer.gotoTest",
+                    "when": "view == gtestExplorer && config.gtest-adapter.supportLocation",
+                    "group": "gtestExplorer@2"
+                },
+                {
                     "command": "gtestExplorer.debug",
                     "when": "view == gtestExplorer",
                     "group": "gtestExplorer@1"
@@ -171,6 +181,10 @@
                 "gtest-adapter.debugConfig": {
                     "type": "string",
                     "description": "Debug configuration for debugging unittests."
+                },
+                "gtest-adapter.supportLocation": {
+                    "type": "boolean",
+                    "description": "Whether the GoogleTest version being used supports providing for test location."
                 }
             }
         },

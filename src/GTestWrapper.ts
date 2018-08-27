@@ -1,10 +1,13 @@
 import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget } from 'vscode';
 import { ChildProcess, spawn, execSync } from 'child_process';
+import { tmpdir } from 'os';
 import { Controller } from './Controller';
-import { existsSync } from 'fs';
-import { resolve } from 'path';
-import { Status, TestNode } from './TestNode';
+import { existsSync, unlinkSync } from 'fs';
+import { resolve, join } from 'path';
+import { Status, TestNode, TestLocation } from './TestNode';
 import { RunStatus } from './RunStatus';
+import { print } from 'util';
+import { JsonEntry } from './JsonOutputs';
 
 export class GTestWrapper {
     private _passedTests: number;
@@ -161,19 +164,25 @@ export class GTestWrapper {
     }
 
     public loadTestsRootAsync(): Thenable<TestNode | undefined> {
-        return this.loadTestLines().then((fullNames: string[]) => {
-            if (fullNames.length == 0)
+        var filename = 'tmp' + Math.floor(1000000 * Math.random()) + Date.now() + '.json';
+        filename = join(tmpdir(), filename);
+        return this.loadTestLines(filename).then((fullNames: string[]) => {
+            if (fullNames.length == 0) {
+                if (existsSync(filename)) {
+                    unlinkSync(filename);
+                }
                 return undefined;
-            return this.loadTestsRoot(fullNames);
+            }
+            return this.loadTestsRoot(fullNames, filename);
         });
     }
 
-    private loadTestLines(): Thenable<string[]> {
+    private loadTestLines(filename: string): Thenable<string[]> {
         return new Promise((c, e) => {
             const config = this.getTestsConfig();
             if (!config)
                 return c([]);            
-            var results = execSync(config.program + '  --gtest_list_tests', { encoding: "utf8", env: config.env })
+            var results = execSync(config.program + '  --gtest_list_tests --gtest_output=json:' + filename, { encoding: "utf8", env: config.env })
                 .split(/[\r\n]+/g);
             results = results.filter(s => s != null && s.trim() != "");
             c(results);
@@ -181,7 +190,7 @@ export class GTestWrapper {
         });
     }
 
-    private loadTestsRoot(tests: string[]): TestNode {
+    private loadTestsRoot(tests: string[], filename: string): TestNode {
         var root = new TestNode(undefined, "", "Tests")
         var current = root;
         var currentName = "";
@@ -205,7 +214,36 @@ export class GTestWrapper {
                 }
             }
         }
+        if (existsSync(filename)) {
+            workspace.getConfiguration().update("gtest-adapter.supportLocation", true, ConfigurationTarget.Workspace);
+            var workspaceFolder = this.getWorkspaceFolder();
+
+            var content = require(filename) as JsonEntry;
+            var locations: any = {};
+            content.testsuites.forEach(testSuite => {
+                testSuite.testsuite.forEach(test => {
+                    var fullName = testSuite.name + '.' + test.name;
+                    var location = new TestLocation(resolve(workspaceFolder,test.file), test.line);
+                    locations[fullName] = location;
+                })
+            });
+
+            this.fillLeaves(root, locations);
+
+            unlinkSync(filename);
+        } else {
+            workspace.getConfiguration().update("gtest-adapter.supportLocation", false, ConfigurationTarget.Workspace);
+        }
         return root;
+    }
+
+    private fillLeaves(root: TestNode, locations: any) {
+        var children = root.children;
+        if (children.length == 0) {
+            root.location = locations[root.fullName];
+        } else {
+            children.forEach(child => this.fillLeaves(child, locations));
+        }
     }
 
 }

@@ -4,6 +4,7 @@ export class TestNode {
     private _children: any;
     private _fullnames: string[];
     public status: Status;
+    public location: TestLocation | undefined;
 
     constructor(public parent: TestNode | undefined, parentPath: string, name: string) {
         name = name.trim();
@@ -93,4 +94,8 @@ export class TestNode {
             child.clearChildrenStatus();
         });
     }
+}
+
+export class TestLocation {
+    constructor(public file: string, public line: number) {}
 }

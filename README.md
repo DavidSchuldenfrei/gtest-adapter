@@ -1,12 +1,12 @@
-# gtest-adapter README
+# GoogleTest adapter README
 
-Allows viewing all GTests in a tree view, and running/debugging them.
+Allows viewing all GoogleTests in a tree view, and running/debugging them.
 
 ## Features
 
-This extension presents all GTests in your application in a tree view. The developer can then run/debug any of these tests.
+This extension presents all GoogleTests in your application in a tree view. The developer can then run/debug any of these tests.
 
-![Show GTest Adapter](/images/Demo.gif)
+![Show GoogleTest Adapter](/images/Demo.gif)
 
 ## Extension Settings
 
@@ -14,16 +14,22 @@ This extension contributes the following settings:
 
 * `gtest-adapter.debugConfig`: The name of the debug configuration which defines the GTest test application, and how to debug it.
 
+* `gtest-adapter.supportLocation`: Used internally by the extension to know if navigating  to the code is supported. The extension will manage the value of this setting automatically, and will decide whether to offer the "Go to Code" option in the popup menu.
+
 ## Known Issues
 
-* There is no way to navigate from a tree leaf to the corresponding test.
+* There is no way to navigate from a tree leaf to the corresponding test, if you are using older versions of GoogleTest (more information about GoogleTest versions [here](/GoogleTestVersion.md)).
 
 
 ## Release Notes
 
+### 1.1.0 
+
+* Feature: Allows navigating from the tree to the corresponding test in the code. Needs newer version of GoogleTest (more information [here](/GoogleTestVersion.md)).
+
 ### 1.0.8
 
-* Feature: Allows seartching in the test tree
+* Feature: Allows searching in the test tree
 
 ### 1.0.7
 
@@ -63,4 +69,4 @@ Minor tweaks.
 
 ### 1.0.0
 
-Initial release of GTest Adapter.
+Initial release of GoogleTest Adapter.
