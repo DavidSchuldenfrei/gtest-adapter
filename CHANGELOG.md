@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.1.0]
+
+* Feature: Allows navigating from the tree to the corresponding test in the code.
+
 ### [1.0.8]
 
 * Feature: Allows searching in the test tree
