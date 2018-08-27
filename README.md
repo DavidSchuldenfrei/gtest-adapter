@@ -1,12 +1,12 @@
-# gtest-adapter README
+# GoogleTest adapter README
 
-Allows viewing all GTests in a tree view, and running/debugging them.
+Allows viewing all GoogleTests in a tree view, and running/debugging them.
 
 ## Features
 
-This extension presents all GTests in your application in a tree view. The developer can then run/debug any of these tests.
+This extension presents all GoogleTests in your application in a tree view. The developer can then run/debug any of these tests.
 
-![Show GTest Adapter](/images/Demo.gif)
+![Show GoogleTest Adapter](/images/Demo.gif)
 
 ## Extension Settings
 
@@ -69,4 +69,4 @@ Minor tweaks.
 
 ### 1.0.0
 
-Initial release of GTest Adapter.
+Initial release of GoogleTest Adapter.
