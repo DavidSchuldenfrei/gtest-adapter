@@ -1,6 +1,6 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands, TreeView, Uri, workspace, Position, Selection, Range } from "vscode";
+import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range } from "vscode";
 import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";

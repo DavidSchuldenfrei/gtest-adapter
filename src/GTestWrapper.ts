@@ -6,7 +6,6 @@ import { existsSync, unlinkSync } from 'fs';
 import { resolve, join } from 'path';
 import { Status, TestNode, TestLocation } from './TestNode';
 import { RunStatus } from './RunStatus';
-import { print } from 'util';
 import { JsonEntry } from './JsonOutputs';
 
 export class GTestWrapper {
