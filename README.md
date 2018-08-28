@@ -23,6 +23,10 @@ This extension contributes the following settings:
 
 ## Release Notes
 
+### 1.1.1
+
+* Fixed Vulnerability. Upgraded used package
+
 ### 1.1.0 
 
 * Feature: Allows navigating from the tree to the corresponding test in the code. Needs newer version of GoogleTest (more information [here](/GoogleTestVersion.md)).
