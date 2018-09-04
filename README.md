@@ -18,7 +18,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-* There is no way to navigate from a tree leaf to the corresponding test, if you are using older versions of GoogleTest (more information about GoogleTest versions [here](/GoogleTestVersion.md)).
+* There is no way to navigate from a tree leaf to the corresponding test, if you are using versions of GoogleTest prior to version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1). (more information about GoogleTest versions [here](/GoogleTestVersion.md))
 
 
 ## Release Notes
@@ -29,7 +29,7 @@ This extension contributes the following settings:
 
 ### 1.1.0 
 
-* Feature: Allows navigating from the tree to the corresponding test in the code. Needs newer version of GoogleTest (more information [here](/GoogleTestVersion.md)).
+* Feature: Allows navigating from the tree to the corresponding test in the code. Needs at least version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1) of GoogleTest.
 
 ### 1.0.8
 
