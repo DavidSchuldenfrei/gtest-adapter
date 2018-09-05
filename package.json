@@ -185,7 +185,12 @@
                 "gtest-adapter.supportLocation": {
                     "type": "boolean",
                     "description": "Whether the GoogleTest version being used supports providing for test location."
-                }
+                },
+                "gtest-adapter.showCodeLens": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Determines whether to show the CodeLens test status or not."
+                  }
             }
         },
         "views": {
