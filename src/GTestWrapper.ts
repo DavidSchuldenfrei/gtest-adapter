@@ -218,12 +218,12 @@ export class GTestWrapper {
             var workspaceFolder = this.getWorkspaceFolder();
 
             var content = require(filename) as JsonEntry;
-            var locations: any = {};
+            var locations = new Map<string, TestLocation>();
             content.testsuites.forEach(testSuite => {
                 testSuite.testsuite.forEach(test => {
                     var fullName = testSuite.name + '.' + test.name;
                     var location = new TestLocation(resolve(workspaceFolder,test.file), test.line);
-                    locations[fullName] = location;
+                    locations.set(fullName, location);
                 })
             });
 
@@ -233,13 +233,14 @@ export class GTestWrapper {
         } else {
             workspace.getConfiguration().update("gtest-adapter.supportLocation", false, ConfigurationTarget.Workspace);
         }
+        this.controller.notifyTreeLoaded(root);
         return root;
     }
 
-    private fillLeaves(root: TestNode, locations: any) {
+    private fillLeaves(root: TestNode, locations: Map<string, TestLocation>) {
         var children = root.children;
         if (children.length == 0) {
-            root.location = locations[root.fullName];
+            root.location = locations.get(root.fullName);
         } else {
             children.forEach(child => this.fillLeaves(child, locations));
         }

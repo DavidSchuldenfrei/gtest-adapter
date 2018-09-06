@@ -87,9 +87,10 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         this.refresh();
     }
 
-    public setTestStatus(testName: string, testStatus: Status) {
+    public setTestStatus(testName: string, testStatus: Status): TestNode | undefined {
         var node = this.findNode(testName);
         node && (node.status = testStatus);
+        return node;
     }
 
     private findNode(nodeName: string): TestNode | undefined {
