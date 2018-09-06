@@ -14,6 +14,14 @@ This extension contributes the following settings:
 
 * `gtest-adapter.debugConfig`: The name of the debug configuration which defines the GTest test application, and how to debug it.
 
+* `gtest-adapter.showCodeLens`: Determines whether to show the CodeLens test status or not. 
+
+* `gtest-adapter.gotoTestTitle`: Used for localization. Title for [Go To Test] in CodeLens. 
+
+* `gtest-adapter.runTitle`: Used for localization. Title for [Run] in CodeLens. 
+
+* `gtest-adapter.debugTitle`: Used for localization. Title for [Debug] in CodeLens. 
+
 * `gtest-adapter.supportLocation`: Used internally by the extension to know if navigating  to the code is supported. The extension will manage the value of this setting automatically, and will decide whether to offer the "Go to Code" option in the popup menu.
 
 ## Known Issues
@@ -27,7 +35,7 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-### 1.1.2
+### 1.2.0
 
 * Feature: Added CodeLens for GoogleTests. Needs at least version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1) of GoogleTest.
 

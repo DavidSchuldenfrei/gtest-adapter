@@ -1,4 +1,4 @@
-import { CodeLensProvider, EventEmitter, Event, ProviderResult, CancellationToken, TextDocument, CodeLens, workspace, Range, Position } from "vscode";
+import { CodeLensProvider, EventEmitter, Event, ProviderResult, CancellationToken, TextDocument, CodeLens, Range, Position } from "vscode";
 import { Status } from "./TestNode";
 import { LineInfo } from "./LineInfo";
 import { CodeLensSettings } from "./CodeLensSettings";

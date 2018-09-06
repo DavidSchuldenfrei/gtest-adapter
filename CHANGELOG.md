@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
-### [1.1.2]
+### [1.2.0]
 
 * Feature: Added CodeLens for GoogleTests.
 
