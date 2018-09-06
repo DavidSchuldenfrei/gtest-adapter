@@ -110,7 +110,7 @@
             },
             {
                 "command": "gtestExplorer.gotoTest",
-                "title": "Goto Test",
+                "title": "Go to Test",
                 "category": "GTest"
             }
         ],
@@ -190,7 +190,22 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Determines whether to show the CodeLens test status or not."
-                  }
+                },
+                "gtest-adapter.gotoTestTitle": {
+                    "type": "string",
+                    "default": "Go to Test",
+                    "description": "Used for localization. Title for [Go To Test] in CodeLens."
+                },
+                "gtest-adapter.runTitle": {
+                    "type": "string",
+                    "default": "Run",
+                    "description": "Used for localization. Title for [Run] in CodeLens."
+                },
+                "gtest-adapter.debugTitle": {
+                    "type": "string",
+                    "default": "Debug",
+                    "description": "Used for localization. Title for [Debug] in CodeLens."
+                }
             }
         },
         "views": {

@@ -1,6 +1,7 @@
 import { CodeLensProvider, EventEmitter, Event, ProviderResult, CancellationToken, TextDocument, CodeLens, workspace, Range, Position } from "vscode";
-import { TestNode, Status } from "./TestNode";
+import { Status } from "./TestNode";
 import { LineInfo } from "./LineInfo";
+import { CodeLensSettings } from "./CodeLensSettings";
 
 export class TestCodeCodeLensProvider implements CodeLensProvider {
     public onDidChangeCodeLensesEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -9,7 +10,7 @@ export class TestCodeCodeLensProvider implements CodeLensProvider {
     public testLocations: Map<string, Map<number, LineInfo>> = new Map();
 
     public provideCodeLenses(document: TextDocument, token: CancellationToken): ProviderResult<CodeLens[]> {
-        if (!workspace.getConfiguration().get<boolean>("gtest-adapter.showCodeLens"))
+        if (!CodeLensSettings.codelensEnabled)
             return undefined;
         var file = this.testLocations.get(document.fileName);
         if (!file)
@@ -20,9 +21,9 @@ export class TestCodeCodeLensProvider implements CodeLensProvider {
             var range = new Range(position, position);
             var node = value.getNode();
             var status = value.status;
-            entries.push(new CodeLens(range, {title: "Go to Tree", command: "gtestExplorer.findTestByNode", arguments: [node], tooltip: "View Test in Tree" }));
-            entries.push(new CodeLens(range, {title: "Run", command: "gtestExplorer.runTestByNode", arguments: [node] }));
-            entries.push(new CodeLens(range, {title: "Debug", command: "gtestExplorer.debugTestByNode", arguments: [node] }));
+            entries.push(new CodeLens(range, {title: CodeLensSettings.gotoTestTitle, command: "gtestExplorer.findTestByNode", arguments: [node], tooltip: "View Test in Tree" }));
+            entries.push(new CodeLens(range, {title: CodeLensSettings.runTitle, command: "gtestExplorer.runTestByNode", arguments: [node] }));
+            entries.push(new CodeLens(range, {title: CodeLensSettings.debugTitle, command: "gtestExplorer.debugTestByNode", arguments: [node] }));
             if (status != Status.Unknown) 
                 entries.push(new CodeLens(range, {title: this.getStatusAsString(status), command: '' }));
         });

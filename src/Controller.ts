@@ -1,11 +1,12 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages } from "vscode";
+import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent } from "vscode";
 import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
 import { TestCodeCodeLensProvider } from "./TestCodeCodeLensProvider";
 import { LineInfo } from "./LineInfo";
+import { CodeLensSettings } from "./CodeLensSettings";
 
 export class Controller {
     private _gtestWrapper: GTestWrapper;
@@ -40,7 +41,15 @@ export class Controller {
         context.subscriptions.push(commands.registerCommand('gtestExplorer.findTestByNode', node => this.findTestByNode(node)));
 
         context.subscriptions.push(this._codeLensProvider);
-        context.subscriptions.push(languages.registerCodeLensProvider({language: "cpp", scheme: "file"}, this._codeLensProvider))
+        context.subscriptions.push(languages.registerCodeLensProvider({language: "cpp", scheme: "file"}, this._codeLensProvider));
+
+        CodeLensSettings.refresh();
+        context.subscriptions.push(workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+            if (CodeLensSettings.refresh()) {
+                this._codeLensProvider.onDidChangeCodeLensesEmitter.fire();
+            }
+        }));
+    
     }
 
     private gotoTest() {
