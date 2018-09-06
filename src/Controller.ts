@@ -5,6 +5,7 @@ import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
 import { TestCodeCodeLensProvider } from "./TestCodeCodeLensProvider";
+import { LineInfo } from "./LineInfo";
 
 export class Controller {
     private _gtestWrapper: GTestWrapper;
@@ -13,8 +14,9 @@ export class Controller {
     private _tree: TestTreeDataProvider;
     private _statusBar: StatusBar;
     private _treeView: TreeView<TestNode>;
-    private _testLocations: Map<string, Map<number, TestNode[]>>;
+    private _testLocations: Map<string, Map<number, LineInfo>>;
     private _codeLensProvider: TestCodeCodeLensProvider = new TestCodeCodeLensProvider();
+    private _lineInfosToResfresh: Set<LineInfo> = new Set();
 
     constructor(context: ExtensionContext) {
         this._gtestWrapper = new GTestWrapper(this);
@@ -65,12 +67,26 @@ export class Controller {
     }
 
     public setTestStatus(testName: string, testStatus: Status) {
-        this._tree.setTestStatus(testName, testStatus);
+        var node = this._tree.setTestStatus(testName, testStatus);
+        if (node && node.location) {
+            var file = this._testLocations.get(node.location.file);
+            if (file) {
+                var line = file.get(node.location.line);
+                if (line) {
+                    line.notifyNodeStatus(testStatus);
+                    this._lineInfosToResfresh.add(line);
+                }
+            }
+        } 
     }
 
     public refreshDisplay(runStatus: RunStatus, passedCount: number, totalCount: number) {
         this._tree.refresh();
         this._statusBar.refresh(runStatus, passedCount, totalCount);
+        if (runStatus == RunStatus.RunCompleted) {
+            this._lineInfosToResfresh.forEach(line => line.refresh());
+            this._lineInfosToResfresh.clear();
+        }
         this._codeLensProvider.onDidChangeCodeLensesEmitter.fire();
     }
 
@@ -93,19 +109,19 @@ export class Controller {
             }
             var line = file.get(node.location.line);
             if (!line) {
-                line = [];
+                line = new LineInfo();
                 file.set(node.location.line, line);
             }
-            line.push(node);
+            line.addNode(node);
         }
         node.children.forEach(child => this.addNodeToLocations(child));
-
     }
 
     private runAllTests() {
         this._currentTestName = "*";
         this._currentNode = undefined;
         this._tree.clearResults(this._currentNode);
+        this._lineInfosToResfresh.clear();
         this._gtestWrapper.runAllTests();
     }
 
@@ -117,6 +133,7 @@ export class Controller {
 
     private runTestByNode(node: TestNode) {
         this._tree.clearResults(node);
+        this._lineInfosToResfresh.clear();
         this._gtestWrapper.runTestByName(node.fullName);
     }
 
@@ -126,6 +143,7 @@ export class Controller {
 
     private rerun() {
         this._tree.clearResults(this._currentNode);
+        this._lineInfosToResfresh.clear();
         this._gtestWrapper.runTestByName(this._currentTestName);
     }
 
