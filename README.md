@@ -20,8 +20,16 @@ This extension contributes the following settings:
 
 * There is no way to navigate from a tree leaf to the corresponding test, if you are using versions of GoogleTest prior to version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1). (more information about GoogleTest versions [here](/GoogleTestVersion.md))
 
+* Codelens isn't available , if you are using versions of GoogleTest prior to version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1). (more information about GoogleTest versions [here](/GoogleTestVersion.md))
+
+* Codelens isn't updated when changes are made to the code. To refresh Codelens, you need to rebuild the googletest application , and refresh the tests tree.
+
 
 ## Release Notes
+
+### 1.1.2
+
+* Feature: Added CodeLens for GoogleTests. Needs at least version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1) of GoogleTest.
 
 ### 1.1.1
 
