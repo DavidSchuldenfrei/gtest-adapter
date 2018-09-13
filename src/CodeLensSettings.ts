@@ -1,7 +1,7 @@
 import { workspace } from "vscode";
 
 export class CodeLensSettings {
-    public static gotoTestTitle = "Go to Test";
+    public static gotoTestTitle = "Go to Tree";
     public static runTitle = "Run";
     public static debugTitle = "Debug";
     public static codelensEnabled: boolean | undefined = true;

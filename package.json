@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -109,8 +109,8 @@
                 "category": "GTest"
             },
             {
-                "command": "gtestExplorer.gotoTest",
-                "title": "Go to Test",
+                "command": "gtestExplorer.gotoCode",
+                "title": "Go to Code",
                 "category": "GTest"
             }
         ],
@@ -160,7 +160,7 @@
             ],
             "view/item/context": [
                 {
-                    "command": "gtestExplorer.gotoTest",
+                    "command": "gtestExplorer.gotoCode",
                     "when": "view == gtestExplorer && config.gtest-adapter.supportLocation",
                     "group": "gtestExplorer@2"
                 },
@@ -193,7 +193,7 @@
                 },
                 "gtest-adapter.gotoTestTitle": {
                     "type": "string",
-                    "default": "Go to Test",
+                    "default": "Go to Tree",
                     "description": "Used for localization. Title for [Go To Test] in CodeLens."
                 },
                 "gtest-adapter.runTitle": {
@@ -205,6 +205,11 @@
                     "type": "string",
                     "default": "Debug",
                     "description": "Used for localization. Title for [Debug] in CodeLens."
+                },
+                "gtest-adapter.refreshAfterBuild": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Determines whether to refresh the test tree after a build was completed."
                 }
             }
         },

@@ -1,6 +1,6 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent } from "vscode";
+import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent, tasks, TaskEndEvent } from "vscode";
 import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
@@ -35,10 +35,10 @@ export class Controller {
         context.subscriptions.push(commands.registerCommand('gtestExplorer.rerun', () => this.rerun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.switchConfig', () => this.switchConfig()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.search', () => this.search()));
-        context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoTest', () => this.gotoTest()));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoCode', () => this.gotoCode()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.runTestByNode', node => this.runTestByNode(node)));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.debugTestByNode', node => this.debugTestByNode(node)));
-        context.subscriptions.push(commands.registerCommand('gtestExplorer.findTestByNode', node => this.findTestByNode(node)));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoTree', node => this.gotoTree(node)));
 
         context.subscriptions.push(this._codeLensProvider);
         context.subscriptions.push(languages.registerCodeLensProvider({language: "cpp", scheme: "file"}, this._codeLensProvider));
@@ -49,10 +49,15 @@ export class Controller {
                 this._codeLensProvider.onDidChangeCodeLensesEmitter.fire();
             }
         }));
-    
+        
+        tasks.onDidEndTask(function(event: TaskEndEvent) { 
+            if (event.execution.task.name == "build" && workspace.getConfiguration().get<boolean>("gtest-adapter.refreshAfterBuild")) {
+                commands.executeCommand("gtestExplorer.refresh");
+            }
+        });
     }
 
-    private gotoTest() {
+    private gotoCode() {
         this.initCurrent();
         if (this._currentNode) {
             var currentNode = this._currentNode;
@@ -196,7 +201,7 @@ export class Controller {
         }
     }
 
-    private findTestByNode(node: TestNode) {
+    private gotoTree(node: TestNode) {
         this._treeView.reveal(node);
         commands.executeCommand('workbench.view.test');
     }

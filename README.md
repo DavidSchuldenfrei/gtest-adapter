@@ -14,7 +14,9 @@ This extension contributes the following settings:
 
 * `gtest-adapter.debugConfig`: The name of the debug configuration which defines the GTest test application, and how to debug it.
 
-* `gtest-adapter.showCodeLens`: Determines whether to show the CodeLens test status or not. 
+* `gtest-adapter.showCodeLens`: Determines whether to show the CodeLens test status or not. Default is true
+
+* `gtest-adapter.refreshAfterBuild`: Determines whether to automatically refresh the test tree after each build. Default is true
 
 * `gtest-adapter.gotoTestTitle`: Used for localization. Title for [Go To Test] in CodeLens. 
 
@@ -34,6 +36,10 @@ This extension contributes the following settings:
 
 
 ## Release Notes
+
+### 1.2.1
+
+* Feature: Added option to automatically refresh test tree after each build
 
 ### 1.2.0
 

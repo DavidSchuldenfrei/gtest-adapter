@@ -21,7 +21,7 @@ export class TestCodeCodeLensProvider implements CodeLensProvider {
             var range = new Range(position, position);
             var node = value.getNode();
             var status = value.status;
-            entries.push(new CodeLens(range, {title: CodeLensSettings.gotoTestTitle, command: "gtestExplorer.findTestByNode", arguments: [node], tooltip: "View Test in Tree" }));
+            entries.push(new CodeLens(range, {title: CodeLensSettings.gotoTestTitle, command: "gtestExplorer.gotoTree", arguments: [node], tooltip: "View Test in Tree" }));
             entries.push(new CodeLens(range, {title: CodeLensSettings.runTitle, command: "gtestExplorer.runTestByNode", arguments: [node] }));
             entries.push(new CodeLens(range, {title: CodeLensSettings.debugTitle, command: "gtestExplorer.debugTestByNode", arguments: [node] }));
             if (status != Status.Unknown) 
