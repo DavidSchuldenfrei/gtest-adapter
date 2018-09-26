@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.2.2]
+
+* Bug: Go to Tests didn't work in some configurations
+ 
 ### [1.2.1]
 
 * Feature: Added option to automatically refresh test tree after each build

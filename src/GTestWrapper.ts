@@ -215,14 +215,13 @@ export class GTestWrapper {
         }
         if (existsSync(filename)) {
             workspace.getConfiguration().update("gtest-adapter.supportLocation", true, ConfigurationTarget.Workspace);
-            var workspaceFolder = this.getWorkspaceFolder();
 
             var content = require(filename) as JsonEntry;
             var locations = new Map<string, TestLocation>();
             content.testsuites.forEach(testSuite => {
                 testSuite.testsuite.forEach(test => {
                     var fullName = testSuite.name + '.' + test.name;
-                    var location = new TestLocation(resolve(workspaceFolder,test.file), test.line);
+                    var location = new TestLocation(test.file, test.line);
                     locations.set(fullName, location);
                 })
             });
