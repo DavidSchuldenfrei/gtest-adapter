@@ -8,6 +8,10 @@ This extension presents all GoogleTests in your application in a tree view. The 
 
 ![Show GoogleTest Adapter](/images/Demo.gif)
 
+## Usage
+
+This extension is standalone, and doesn't depend on any other extensions. To use this extension, you must first define a "Debug" configuration in `launch.json` to debug your GoogleTests, and then set this for your tests `debugConfig`.  
+
 ## Extension Settings
 
 This extension contributes the following settings:
@@ -36,6 +40,10 @@ This extension contributes the following settings:
 
 
 ## Release Notes
+
+### 1.2.2
+
+* Bug: Go to Tests didn't work in some configurations 
 
 ### 1.2.1
 

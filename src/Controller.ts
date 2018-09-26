@@ -7,6 +7,9 @@ import { RunStatus } from "./RunStatus";
 import { TestCodeCodeLensProvider } from "./TestCodeCodeLensProvider";
 import { LineInfo } from "./LineInfo";
 import { CodeLensSettings } from "./CodeLensSettings";
+import { resolve } from "url";
+import { basename, sep } from "path";
+import { existsSync } from "fs";
 
 export class Controller {
     private _gtestWrapper: GTestWrapper;
@@ -108,10 +111,59 @@ export class Controller {
         return this._gtestWrapper.loadTestsRootAsync();
     }
 
-    public notifyTreeLoaded(root: TestNode) {
+    public async notifyTreeLoaded(root: TestNode) {
         this._testLocations.clear();
         this.addNodeToLocations(root);
+        var rootFolder = await this.findPrefix(Array.from(this._testLocations.keys()));
+        if (rootFolder) {
+            var folder = rootFolder
+            var newTestLocations = new Map();
+            this._testLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key), value));
+            this._testLocations = newTestLocations;
+            this.fixLocations(rootFolder, root);
+        }
         this._codeLensProvider.testLocations = this._testLocations;
+    }
+
+    private fixLocations(rootFolder: string, root: TestNode) {
+        if (root.location) {
+            root.location.file = resolve(rootFolder, root.location.file);
+        }
+        root.children.forEach(child => this.fixLocations(rootFolder, child));
+    }
+
+    private resolveNative(from: string, to: string) {
+        var result = resolve(from, to);
+        if (sep == '\\') {
+            result = result.replace(/\//g,"\\");
+        }
+        return result;
+    }
+
+    private async findPrefix(locations: string[]) {
+        var candidates: string[] = [];
+        if (locations.length == 0)
+            return undefined;
+        var location = locations[0];
+        var files = await workspace.findFiles("**/" + location);
+        if (files.length == 0) {
+            var fileName = basename(location);
+            files = await workspace.findFiles("**/" + fileName);
+            files = files.filter(file => file.fsPath.endsWith(location));
+        }
+        files.forEach(file => {
+            candidates.push(file.fsPath.substr(0, file.fsPath.length - location.length));
+        });
+        for (var i = 1; i < locations.length; ++i) {
+            if (candidates.length < 2) {
+                break;
+            }
+            var location = locations[i];
+            candidates = candidates.filter(candidate => existsSync(resolve(candidate, location)));        
+        }
+        if (candidates.length == 1)
+            return candidates[0];
+        return undefined;
     }
 
     private addNodeToLocations(node: TestNode) {

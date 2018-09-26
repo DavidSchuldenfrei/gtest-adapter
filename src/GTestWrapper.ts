@@ -222,7 +222,7 @@ export class GTestWrapper {
             content.testsuites.forEach(testSuite => {
                 testSuite.testsuite.forEach(test => {
                     var fullName = testSuite.name + '.' + test.name;
-                    var location = new TestLocation(resolve(workspaceFolder,test.file), test.line);
+                    var location = new TestLocation(test.file, test.line);
                     locations.set(fullName, location);
                 })
             });
