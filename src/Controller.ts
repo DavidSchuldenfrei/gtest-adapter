@@ -114,22 +114,22 @@ export class Controller {
     public async notifyTreeLoaded(root: TestNode) {
         this._testLocations.clear();
         this.addNodeToLocations(root);
-        var rootFolder = await this.findPrefix(Array.from(this._testLocations.keys()));
-        if (rootFolder) {
-            var folder = rootFolder
+        var prefix = await this.findPrefix(Array.from(this._testLocations.keys()));
+        if (prefix.root) {
+            var folder = prefix.root
             var newTestLocations = new Map();
-            this._testLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key), value));
+            this._testLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key.substr(3 * prefix.parentFoldersCount)), value));
             this._testLocations = newTestLocations;
-            this.fixLocations(rootFolder, root);
+            this.fixLocations(prefix.root, prefix.parentFoldersCount, root);
         }
         this._codeLensProvider.testLocations = this._testLocations;
     }
 
-    private fixLocations(rootFolder: string, root: TestNode) {
+    private fixLocations(rootFolder: string, depth: number, root: TestNode) {
         if (root.location) {
-            root.location.file = resolve(rootFolder, root.location.file);
+            root.location.file = this.resolveNative(rootFolder, root.location.file.substr(3 * depth));
         }
-        root.children.forEach(child => this.fixLocations(rootFolder, child));
+        root.children.forEach(child => this.fixLocations(rootFolder, depth, child));
     }
 
     private resolveNative(from: string, to: string) {
@@ -141,10 +141,13 @@ export class Controller {
     }
 
     private async findPrefix(locations: string[]) {
+        locations = locations.sort((a, b) => this.getParentFoldersCount(a) - this.getParentFoldersCount(b));
         var candidates: string[] = [];
         if (locations.length == 0)
-            return undefined;
+            return { root: undefined, parentFoldersCount: 0 };
         var location = locations[0];
+        var parentFoldersCount = this.getParentFoldersCount(location);
+        location = location.substr(3 * parentFoldersCount);
         var files = await workspace.findFiles("**/" + location);
         if (files.length == 0) {
             var fileName = basename(location);
@@ -158,12 +161,22 @@ export class Controller {
             if (candidates.length < 2) {
                 break;
             }
-            var location = locations[i];
+            var location = locations[i].substr(3 * parentFoldersCount);
             candidates = candidates.filter(candidate => existsSync(resolve(candidate, location)));        
         }
         if (candidates.length == 1)
-            return candidates[0];
-        return undefined;
+            return { root: candidates[0], parentFoldersCount: parentFoldersCount };
+        return { root: undefined, parentFoldersCount: parentFoldersCount };
+    }
+
+    private getParentFoldersCount(location: string) {
+        var depth = 0;
+        var current = location;
+        while (current.startsWith("..")) {
+            depth++;
+            current = current.substr(3);
+        }
+        return depth;
     }
 
     private addNodeToLocations(node: TestNode) {

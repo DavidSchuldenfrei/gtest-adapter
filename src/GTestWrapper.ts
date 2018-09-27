@@ -4,9 +4,10 @@ import { tmpdir } from 'os';
 import { Controller } from './Controller';
 import { existsSync, unlinkSync } from 'fs';
 import { resolve, join } from 'path';
-import { Status, TestNode, TestLocation } from './TestNode';
+import { Status, TestNode } from './TestNode';
 import { RunStatus } from './RunStatus';
 import { JsonEntry } from './JsonOutputs';
+import { TestLocation } from './TestLocation';
 
 export class GTestWrapper {
     private _passedTests: number;
