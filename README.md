@@ -41,7 +41,7 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-### 1.2.2
+### 1.2.3
 
 * Bug: Go to Tests didn't work in some configurations 
 

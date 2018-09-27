@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
-### [1.2.2]
+### [1.2.3]
 
 * Bug: Go to Tests didn't work in some configurations
  
