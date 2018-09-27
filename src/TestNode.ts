@@ -1,3 +1,5 @@
+import { TestLocation } from "./TestLocation";
+
 export enum Status {Unknown, Passed, Failed}
 export class TestNode {
     private _name: string;
@@ -94,8 +96,4 @@ export class TestNode {
             child.clearChildrenStatus();
         });
     }
-}
-
-export class TestLocation {
-    constructor(public file: string, public line: number) {}
 }
