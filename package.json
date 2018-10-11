@@ -236,14 +236,7 @@
             "language": "googletestout",
             "scopeName": "text.googletestout",
             "path": "./syntaxes/googletestout.tmLanguage.json"            
-        }],
-        "themes": [
-            {
-                "label": "GoogleTest Output Colors",
-                "uiTheme": "vs-dark",
-                "path": "./themes/GoogleTestOutputColorsTheme.json"
-            }
-        ]
+        }]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",
