@@ -1,4 +1,4 @@
-import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget } from 'vscode';
+import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget, OutputChannel } from 'vscode';
 import { ChildProcess, spawn, execSync } from 'child_process';
 import { tmpdir } from 'os';
 import { Controller } from './Controller';
@@ -13,10 +13,12 @@ export class GTestWrapper {
     private _passedTests: number;
     private _failedTests: number;
     private _runner: ChildProcess | undefined;
+    private _outputChannel: OutputChannel;
 
     constructor(private controller: Controller) {
         this._passedTests = 0;
         this._failedTests = 0;
+        this._outputChannel = window.createOutputChannel('GoogleTest output');
     }
 
 
@@ -37,6 +39,12 @@ export class GTestWrapper {
         if (!config)
             return;
         this._runner = spawn(config.program, args, { detached: true, cwd: this.getWorkspaceFolder(), env: config.env });
+        if (workspace.getConfiguration().get<boolean>("gtest-adapter.showRunOutput")) {
+            this._outputChannel.show();
+        }
+        if (workspace.getConfiguration().get<boolean>("gtest-adapter.clearRunOutput")) {
+            this._outputChannel.clear();
+        }
         this._runner.stdout.on('data', data => {
             var dataStr = '';
             if (typeof (data) == 'string') {
@@ -44,6 +52,7 @@ export class GTestWrapper {
             } else {
                 dataStr = (data as Buffer).toString();
             }
+            this._outputChannel.append(dataStr);
             var lines = dataStr.split(/[\r\n]+/g);
             lines.forEach(line => {
                 if (line.startsWith('[       OK ]') && line.endsWith(')')) {

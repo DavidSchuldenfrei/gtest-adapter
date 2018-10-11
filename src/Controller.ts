@@ -10,6 +10,7 @@ import { CodeLensSettings } from "./CodeLensSettings";
 import { resolve } from "url";
 import { basename, sep } from "path";
 import { existsSync } from "fs";
+import { SchemeSetup } from "./SchemeSetup";
 
 export class Controller {
     private _gtestWrapper: GTestWrapper;
@@ -58,6 +59,7 @@ export class Controller {
                 commands.executeCommand("gtestExplorer.refresh");
             }
         });
+        SchemeSetup.Setup();
     }
 
     private gotoCode() {

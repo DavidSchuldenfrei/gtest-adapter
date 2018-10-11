@@ -1,0 +1,31 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "GoogleTest Output",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		}
+	],	
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "googletest.failed",
+					"match": "\\[\\s\\sFAILED\\s\\s\\]"
+				},
+				{
+					"name": "googletest.passed",
+					"match": "\\[(\\s\\s\\s\\s\\s\\s\\sOK\\s|\\s\\sPASSED\\s\\s)\\]"
+				},
+				{
+					"name": "googletest.run",
+					"match": "\\[(==========|----------|\\sRUN\\s\\s\\s\\s\\s\\s)\\]"
+				}
+			]
+		}
+	},
+	"scopeName": "text.googletestout"
+}
