@@ -39,7 +39,12 @@ export class GTestWrapper {
         if (!config)
             return;
         this._runner = spawn(config.program, args, { detached: true, cwd: this.getWorkspaceFolder(), env: config.env });
-        this._outputChannel.show();
+        if (workspace.getConfiguration().get<boolean>("gtest-adapter.showRunOutput")) {
+            this._outputChannel.show();
+        }
+        if (workspace.getConfiguration().get<boolean>("gtest-adapter.clearRunOutput")) {
+            this._outputChannel.clear();
+        }
         this._runner.stdout.on('data', data => {
             var dataStr = '';
             if (typeof (data) == 'string') {

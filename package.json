@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -210,6 +210,16 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Determines whether to refresh the test tree after a build was completed."
+                },
+                "gtest-adapter.showRunOutput": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Determines whether to show the output of the GoogleTest runs."
+                },
+                "gtest-adapter.clearRunOutput": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Determines whether to clear the output of the GoogleTest runs whenever starting a new run."
                 }
             }
         },

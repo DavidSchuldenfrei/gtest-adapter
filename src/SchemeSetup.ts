@@ -22,7 +22,7 @@ export class SchemeSetup {
 
     public static Setup() {
         var config = workspace.getConfiguration();
-        var colorCustomizations: any = config.get("editor.tokenColorCustomizations");
+        var colorCustomizations = config.get<ColorCustomizations>("editor.tokenColorCustomizations");
         if (!colorCustomizations) {
             colorCustomizations = {                
             };
@@ -53,6 +53,10 @@ export class SchemeSetup {
     }
 }
 
-class Scope {
-    constructor(public scope: string) {}
+interface Scope {
+    scope: string;
+}
+
+interface ColorCustomizations {
+    textMateRules?: Scope[];
 }

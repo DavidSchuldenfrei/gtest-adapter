@@ -30,6 +30,12 @@ This extension contributes the following settings:
 
 * `gtest-adapter.supportLocation`: Used internally by the extension to know if navigating  to the code is supported. The extension will manage the value of this setting automatically, and will decide whether to offer the "Go to Code" option in the popup menu.
 
+* `gtest-adapter.showRunOutput`: Determines whether to show the output of the GoogleTest runs. Default is true
+
+* `gtest-adapter.clearRunOutput`: Determines whether to clear the output of the GoogleTest runs whenever starting a new run. Default is true
+
+In addition to these specific extensions settings, this extension creates adds to the `editor.tokenColorCustomizations` setting to allow for coloring the GoogleTest output.
+
 ## Known Issues
 
 * There is no way to navigate from a tree leaf to the corresponding test, if you are using versions of GoogleTest prior to version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1). (more information about GoogleTest versions [here](/GoogleTestVersion.md))
@@ -40,6 +46,10 @@ This extension contributes the following settings:
 
 
 ## Release Notes
+
+### 1.2.4
+
+* Feature: Shows output of GoogleTest runs
 
 ### 1.2.3
 
