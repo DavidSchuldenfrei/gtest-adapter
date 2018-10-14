@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.2.5]
+
+* Feature: Easier extension configuration
+
 ### [1.2.4]
 
 * Feature: Shows output of GoogleTest runs

@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -11,7 +11,8 @@
         "name": "David Schuldenfrei"
     },
     "contributors": [
-        "Assaf Sapir"
+        "Assaf Sapir", 
+        "Grant Zietsman"
     ],
     "homepage": "https://github.com/DavidSchuldenfrei/gtest-adapter/blob/master/README.md",
     "bugs": {

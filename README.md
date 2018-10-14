@@ -47,6 +47,10 @@ In addition to these specific extensions settings, this extension creates adds t
 
 ## Release Notes
 
+### 1.2.5
+
+* Feature: Easier extension configuration
+
 ### 1.2.4
 
 * Feature: Shows output of GoogleTest runs
