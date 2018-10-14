@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.2.6]
+
+* Enhancement: Better tree experience. Selecting a tree action by right click (Run/Debug/Go to code) will execute the action on the right clicked node, and not the selected one.
+
 ### [1.2.5]
 
 * Feature: Easier extension configuration

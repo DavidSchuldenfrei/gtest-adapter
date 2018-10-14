@@ -32,14 +32,14 @@ export class Controller {
         this._testLocations = new Map();
 
         context.subscriptions.push(commands.registerCommand('gtestExplorer.refresh', () => this.reloadAll()));
-        context.subscriptions.push(commands.registerCommand('gtestExplorer.run', () => this.runCurrentTest()));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.run', this.runCurrentTest, this));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.runAll', () => this.runAllTests()));
-        context.subscriptions.push(commands.registerCommand('gtestExplorer.debug', () => this.debugTest()));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.debug', this.debugTest, this));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.stop', () => this.stopRun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.rerun', () => this.rerun()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.switchConfig', () => this.switchConfig()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.search', () => this.search()));
-        context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoCode', () => this.gotoCode()));
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoCode', this.gotoCode, this));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.runTestByNode', node => this.runTestByNode(node)));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.debugTestByNode', node => this.debugTestByNode(node)));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoTree', node => this.gotoTree(node)));
@@ -62,8 +62,8 @@ export class Controller {
         SchemeSetup.Setup();
     }
 
-    private gotoCode() {
-        this.initCurrent();
+    private gotoCode(node: TestNode) {
+        this.initCurrent(node);
         if (this._currentNode) {
             var currentNode = this._currentNode;
             while (currentNode.children.length) {
@@ -206,10 +206,11 @@ export class Controller {
         this._gtestWrapper.runAllTests();
     }
 
-    private runCurrentTest() {
-        this.initCurrent();
-        if (this._currentNode) 
+    private runCurrentTest(node: TestNode) {
+        this.initCurrent(node);
+        if (this._currentNode) {
             this.runTestByNode(this._currentNode);
+        }
     }
 
     private runTestByNode(node: TestNode) {
@@ -232,8 +233,8 @@ export class Controller {
         this._gtestWrapper.stopRun();
     }
 
-    private debugTest() {
-        this.initCurrent();
+    private debugTest(node: TestNode) {
+        this.initCurrent(node);
         this._gtestWrapper.debugTest(this._currentTestName);
     }
 
@@ -241,14 +242,19 @@ export class Controller {
         this._gtestWrapper.switchConfig();
     }
 
-    private initCurrent() {
-        var nodes = this._treeView.selection;
-        if (nodes.length > 0) {
-            this._currentTestName = nodes[0].fullName;
-            this._currentNode = nodes[0];
+    private initCurrent(node: TestNode) {
+        if (node) {
+            this._currentTestName = node.fullName;
+            this._currentNode = node;
         } else {
-            this._currentTestName = "*";
-            this._currentNode = undefined;
+            var nodes = this._treeView.selection;
+            if (nodes.length > 0) {
+                this._currentTestName = nodes[0].fullName;
+                this._currentNode = nodes[0];
+            } else {
+                this._currentTestName = "*";
+                this._currentNode = undefined;
+            }
         }
     }
 

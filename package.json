@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
