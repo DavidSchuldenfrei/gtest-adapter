@@ -42,10 +42,14 @@ In addition to these specific extensions settings, this extension creates adds t
 
 * Codelens isn't available , if you are using versions of GoogleTest prior to version [1.8.1](https://github.com/google/googletest/tree/release-1.8.1). (more information about GoogleTest versions [here](/GoogleTestVersion.md))
 
-* Codelens isn't updated when changes are made to the code. To refresh Codelens, you need to rebuild the googletest application , and refresh the tests tree.
+* Codelens isn't updated when changes are made to the code. To refresh Codelens, you need to rebuild the googletest application , and refresh the tests tree. If the Codelens with this limitation is distracting, it can be disabled by setting `gtest-adapter.showCodeLens` to `false`.
 
 
 ## Release Notes
+
+### 1.3.0
+
+* Enhancement: Better tree experience. Selecting a tree action by right click (Run/Debug/Go to code) will execute the action on the right clicked node, and not the selected one.
 
 ### 1.2.5
 
