@@ -196,7 +196,7 @@ export class GTestWrapper {
             } else {
                 var options: string[] = [];
                 debugConfigs.forEach(s => options.push(s.name));
-                window.showQuickPick(options)
+                window.showQuickPick(options, {placeHolder: "You first need to select a debug configuration, for your tests"})
                     .then(s => {
                         if (s) {
                             workspace.getConfiguration().update("gtest-adapter.debugConfig", s, ConfigurationTarget.Workspace);
