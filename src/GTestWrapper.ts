@@ -193,7 +193,8 @@ export class GTestWrapper {
                 return c([]);            
             var results = execSync(config.program + '  --gtest_list_tests --gtest_output=json:' + filename, { encoding: "utf8", env: config.env })
                 .split(/[\r\n]+/g);
-            results = results.filter(s => s != null && s.trim() != "");
+            results = results.filter(s => s != null && s.trim() != "" 
+                && !s.startsWith("Running main(") &&!s.startsWith("Finished running"));
             c(results);
             return c([]);
         });
