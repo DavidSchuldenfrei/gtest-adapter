@@ -1,4 +1,4 @@
-import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget, OutputChannel } from 'vscode';
+import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget, OutputChannel, tasks, TaskGroup, TaskEndEvent } from 'vscode';
 import { ChildProcess, spawn, execSync } from 'child_process';
 import { tmpdir } from 'os';
 import { Controller } from './Controller';
@@ -8,6 +8,37 @@ import { Status, TestNode } from './TestNode';
 import { RunStatus } from './RunStatus';
 import { JsonEntry } from './JsonOutputs';
 import { TestLocation } from './TestLocation';
+
+function getPlatform(): string {
+    if (process.platform === 'win32')
+        return 'windows';
+    else if (process.platform === 'darwin')
+        return 'osx';
+    else return 'linux';
+}
+ function appExistsSync(app: string) : boolean
+{
+    let exists = existsSync(app);
+    if (!exists)
+    {
+        const platform = getPlatform();
+        const extensions_exist = (extensions : string[]) => {
+            for (const ext of extensions)
+            {
+                if (!app.endsWith(ext))
+                {
+                    if (existsSync(app + ext)) return true;
+                }
+            }
+            return false;
+        }
+         if (platform === "windows")
+        {
+            return extensions_exist(['.exe']);
+        }
+    }
+    return exists;
+}
 
 export class GTestWrapper {
     private _passedTests: number;
@@ -98,9 +129,9 @@ export class GTestWrapper {
         if (debugConfigs.length == 0) {
             window.showErrorMessage(`You first need to define a debug configuration, for your tests`);
         } else {
-            var options: string[] = [];
-            debugConfigs.forEach(s => options.push(s.name));
-            window.showInformationMessage(`Select a debug configuration, for your tests`, ...options)
+            const selected = workspace.getConfiguration().get<string>("gtest-adapter.debugConfig");
+            let options = debugConfigs.filter(s => s.name !== selected).map(s => s.name);
+            window.showQuickPick(options)
                 .then(s => {
                     if (s) {
                         workspace.getConfiguration().update("gtest-adapter.debugConfig", s, ConfigurationTarget.Workspace);
@@ -116,6 +147,46 @@ export class GTestWrapper {
         return debugConfigs.find(config => { return config.name == debugConfigName; });
     }
 
+    private getDebugProgram(debugConfig: CppDebugConfig): string | undefined {
+        let program = debugConfig.program;
+        const platform = getPlatform();
+        if (debugConfig[platform] && debugConfig[platform].program)
+            program = debugConfig[platform].program;
+        return program;
+    }
+
+    private runBuildTask()
+    {
+        tasks.fetchTasks().then(task_list => {
+            const build_task_list = task_list.filter(task => task.group === TaskGroup.Build);
+            const build_task_names = build_task_list.map(task => task.name);
+            if (build_task_names.length > 0)
+            {
+                window.showQuickPick(build_task_names).then(build_task_name => {
+                    if (build_task_name)
+                    {
+                        const build_task = build_task_list.find(task => task.name == build_task_name);
+                        if (build_task)
+                        {
+                            const task_end_event = (event: TaskEndEvent) =>
+                            {
+                                if (event.execution.task.name === build_task_name)
+                                {
+                                    sub.dispose();
+                                    this.controller.reloadAll();
+                                }
+                            };
+                            const sub = tasks.onDidEndTask(task_end_event);
+                            tasks.executeTask(build_task);
+                        }
+                        else window.showErrorMessage(`Failed to execute "${build_task_name}" task.`);
+                    }
+                });                             
+            }
+            else window.showErrorMessage('No build tasks available.');
+        });
+    }
+
     private getTestsConfig(): TestConfig | undefined {
         var debugConfig = this.getDebugConfig();
         if (!debugConfig) {
@@ -125,7 +196,7 @@ export class GTestWrapper {
             } else {
                 var options: string[] = [];
                 debugConfigs.forEach(s => options.push(s.name));
-                window.showErrorMessage(`You first need to select a debug configuration, for your tests`, ...options)
+                window.showQuickPick(options, {placeHolder: "You first need to select a debug configuration, for your tests"})
                     .then(s => {
                         if (s) {
                             workspace.getConfiguration().update("gtest-adapter.debugConfig", s, ConfigurationTarget.Workspace);
@@ -139,12 +210,22 @@ export class GTestWrapper {
         }
 
         var workspaceFolder = this.getWorkspaceFolder();
-        var testConfig = debugConfig.program;
+        var testConfig = this.getDebugProgram(debugConfig);
+        if (!testConfig)
+        {
+            window.showErrorMessage("Selected debug configuration is missing the program field.");
+            return undefined;
+        }
         testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder);
         testConfig = testConfig.replace("${workspaceRoot}", workspaceFolder); //Deprecated but might still be used.
         const testApp = resolve(workspaceFolder, testConfig);
-        if (!existsSync(testApp)) {
-            window.showErrorMessage("You need to first build the unit test app");
+        if (!appExistsSync(testApp)) {
+            window.showErrorMessage(`Unable to locate Google Test in debug configuration:\n${testApp}`, 'Build', 'Switch', 'Ignore').then(selection => {
+                if (selection === 'Build')
+                    this.runBuildTask();
+                else if (selection === 'Switch')
+                    this.switchConfig();
+            });
             return undefined;
         }
         var env = process.env;
