@@ -1,6 +1,6 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent, tasks, TaskEndEvent } from "vscode";
+import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent, tasks, TaskEndEvent, TaskGroup } from "vscode";
 import { Status, TestNode } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
@@ -55,7 +55,7 @@ export class Controller {
         }));
         
         tasks.onDidEndTask(function(event: TaskEndEvent) { 
-            if (event.execution.task.name == "build" && workspace.getConfiguration().get<boolean>("gtest-adapter.refreshAfterBuild")) {
+            if ((event.execution.task.group == TaskGroup.Build || event.execution.task.group == TaskGroup.Rebuild) && workspace.getConfiguration().get<boolean>("gtest-adapter.refreshAfterBuild")) {
                 commands.executeCommand("gtestExplorer.refresh");
             }
         });

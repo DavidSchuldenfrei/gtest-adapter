@@ -143,7 +143,7 @@ export class GTestWrapper {
 
     private getDebugConfig(): CppDebugConfig | undefined {
         const debugConfigName = workspace.getConfiguration("gtest-adapter").get<string>("debugConfig");
-        const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
+        const debugConfigs = workspace.getConfiguration("launch", null).get("configurations") as Array<CppDebugConfig>;
         return debugConfigs.find(config => { return config.name == debugConfigName; });
     }
 
