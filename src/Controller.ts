@@ -1,11 +1,10 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
 import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent, tasks, TaskEndEvent, TaskGroup } from "vscode";
-import { Status, TestNode } from "./TestNode";
+import { Status, TestNode, LineInfo } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
 import { TestCodeCodeLensProvider } from "./TestCodeCodeLensProvider";
-import { LineInfo } from "./LineInfo";
 import { CodeLensSettings } from "./CodeLensSettings";
 import { resolve } from "url";
 import { basename, sep } from "path";

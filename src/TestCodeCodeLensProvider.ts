@@ -1,7 +1,7 @@
 import { CodeLensProvider, EventEmitter, Event, ProviderResult, CancellationToken, TextDocument, CodeLens, Range, Position } from "vscode";
-import { Status } from "./TestNode";
-import { LineInfo } from "./LineInfo";
+import { Status, LineInfo } from "./TestNode";
 import { CodeLensSettings } from "./CodeLensSettings";
+
 
 export class TestCodeCodeLensProvider implements CodeLensProvider {
     public onDidChangeCodeLensesEmitter: EventEmitter<any> = new EventEmitter<any>();
