@@ -44,8 +44,15 @@ In addition to these specific extensions settings, this extension creates adds t
 
 * Codelens isn't updated when changes are made to the code. To refresh Codelens, you need to rebuild the googletest application , and refresh the tests tree. If the Codelens with this limitation is distracting, it can be disabled by setting `gtest-adapter.showCodeLens` to `false`.
 
+* Links in GoogleTest output will not work if other extensions declare languages for output windows. This is a limitation of VsCode, which doesn't allow to declare a specific language per Output Channel.
+
+* Links in GoogleTest output wich contain spaces are not recognized. VsCode doesn't support such links, either.
 
 ## Release Notes
+
+### 1.4.0
+
+* Supports links to files from GoogleTest output.
 
 ### 1.3.1
 
