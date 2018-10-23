@@ -364,7 +364,7 @@ export class GTestWrapper {
 }
 
 
-const regexPathAndLine = /^([a-zA-Z]:\\|\\\\|\\|\/\/|\/)?([^\/\\\?\*:]+(\\|\/))*[^\/\\\?\*:]+\(\d+\)/g;
+const regexPathAndLine = /^([a-zA-Z]:\\|\\\\|\\|\/\/|\/)?([^ \/\\\?\*:]+(\\|\/))*[^ \/\\\?\*:]+\(\d+\)/g;
 
 interface CppDebugConfig extends DebugConfiguration {
     program: string;

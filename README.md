@@ -46,6 +46,8 @@ In addition to these specific extensions settings, this extension creates adds t
 
 * Links in GoogleTest output will not work if other extensions declare languages for output windows. This is a limitation of VsCode, which doesn't allow to declare a specific language per Output Channel.
 
+* Links in GoogleTest output wich contain spaces are not recognized. VsCode doesn't support such links, either.
+
 ## Release Notes
 
 ### 1.4.0
