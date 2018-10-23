@@ -363,12 +363,8 @@ export class GTestWrapper {
 
 }
 
-const regexSeparator = "(\\\\|\\/)";
-const regexStartPath = "([a-zA-z]:\\\\|\\\\\\\\|\\\\|\\/\\/|\\/)?";
-const regexValidName = "[^\\/\\\\\\?\\*:]+";
-const regexFolder = "(" + regexValidName + regexSeparator + ")*";
-const regexPath = regexStartPath + regexFolder + regexValidName;
-const regexPathAndLine = "^" + regexPath + "\\(\\d+\\)";
+
+const regexPathAndLine = /^([a-zA-Z]:\\|\\\\|\\|\/\/|\/)?([^\/\\\?\*:]+(\\|\/))*[^\/\\\?\*:]+\(\d+\)/g;
 
 interface CppDebugConfig extends DebugConfiguration {
     program: string;
