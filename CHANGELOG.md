@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.4.0]
+
+* Supports links to files from GoogleTest output.
+
 ### [1.3.1]
 
 * Minor release. If `gtest-adapter.refreshAfterBuild` is set to true, will reload the test tree after every build task. Fixes Ubuntu install issue.
