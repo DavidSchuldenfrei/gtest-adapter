@@ -21,6 +21,7 @@ export class Controller {
     private _testLocations: Map<string, Map<number, LineInfo>>;
     private _codeLensProvider: TestCodeCodeLensProvider = new TestCodeCodeLensProvider();
     private _lineInfosToResfresh: Set<LineInfo> = new Set();
+    private _testPathResolveRoot: string | undefined;
 
     constructor(context: ExtensionContext) {
         this._gtestWrapper = new GTestWrapper(this);
@@ -116,6 +117,7 @@ export class Controller {
         this._testLocations.clear();
         this.addNodeToLocations(root);
         var prefix = await this.findPrefix(Array.from(this._testLocations.keys()));
+        this._testPathResolveRoot = prefix.root;
         if (prefix.root) {
             var folder = prefix.root
             var newTestLocations = new Map();
@@ -202,7 +204,7 @@ export class Controller {
         this._currentNode = undefined;
         this._tree.clearResults(this._currentNode);
         this._lineInfosToResfresh.clear();
-        this._gtestWrapper.runAllTests();
+        this._gtestWrapper.runAllTests(this._testPathResolveRoot);
     }
 
     private runCurrentTest(node: TestNode) {
@@ -215,7 +217,7 @@ export class Controller {
     private runTestByNode(node: TestNode) {
         this._tree.clearResults(node);
         this._lineInfosToResfresh.clear();
-        this._gtestWrapper.runTestByName(node.fullName);
+        this._gtestWrapper.runTestByName(node.fullName, this._testPathResolveRoot);
     }
 
     private debugTestByNode(node: TestNode) {
@@ -225,7 +227,7 @@ export class Controller {
     private rerun() {
         this._tree.clearResults(this._currentNode);
         this._lineInfosToResfresh.clear();
-        this._gtestWrapper.runTestByName(this._currentTestName);
+        this._gtestWrapper.runTestByName(this._currentTestName, this._testPathResolveRoot);
     }
 
     private stopRun() {

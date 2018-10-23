@@ -53,18 +53,18 @@ export class GTestWrapper {
     }
 
 
-    public runAllTests() {
-        this.runTestByName('*');
+    public runAllTests(testPathResolveRoot: string | undefined) {
+        this.runTestByName('*', testPathResolveRoot);
     }  
     
-    public runTestByName(testName: string) {
+    public runTestByName(testName: string, testPathResolveRoot: string | undefined) {
         this.stopRun();
         this._passedTests = 0;
         this._failedTests = 0;
-        setTimeout(() => this.realRunTestByName(testName), 500); //Adding this timeout allows time to clear tree icons
+        setTimeout(() => this.realRunTestByName(testName, testPathResolveRoot), 500); //Adding this timeout allows time to clear tree icons
     }
 
-    private realRunTestByName(testName: string) {
+    private realRunTestByName(testName: string, testPathResolveRoot: string | undefined) {
         const args: ReadonlyArray<string> = ['--gtest_filter=' + testName];
         const config = this.getTestsConfig();
         if (!config)
@@ -76,6 +76,8 @@ export class GTestWrapper {
         if (workspace.getConfiguration().get<boolean>("gtest-adapter.clearRunOutput")) {
             this._outputChannel.clear();
         }
+        let isRun = false;
+        let addedNewLine = false;
         this._runner.stdout.on('data', data => {
             var dataStr = '';
             if (typeof (data) == 'string') {
@@ -83,17 +85,39 @@ export class GTestWrapper {
             } else {
                 dataStr = (data as Buffer).toString();
             }
-            this._outputChannel.append(dataStr);
             var lines = dataStr.split(/[\r\n]+/g);
             lines.forEach(line => {
-                if (line.startsWith('[       OK ]') && line.endsWith(')')) {
-                    this.controller.setTestStatus(GTestWrapper.getTestName(line), Status.Passed);
-                    if (!this._passedTests)
-                        this._passedTests = 0;
-                    this._passedTests++;
-                } else if (line.startsWith('[  FAILED  ]')  && line.endsWith(')')) {
-                    this.controller.setTestStatus(GTestWrapper.getTestName(line), Status.Failed);
-                    this._failedTests++;
+                if (line != '') {
+                    if (line.startsWith('[       OK ]') && line.endsWith(')')) {
+                        this.controller.setTestStatus(GTestWrapper.getTestName(line), Status.Passed);
+                        if (!this._passedTests)
+                            this._passedTests = 0;
+                        this._passedTests++;
+                    } else if (line.startsWith('[  FAILED  ]')  && line.endsWith(')')) {
+                        this.controller.setTestStatus(GTestWrapper.getTestName(line), Status.Failed);
+                        this._failedTests++;
+                    }
+                    if (isRun) {
+                        var match = line.match(regexPathAndLine);
+                       if (match) {
+                           var pathLength = match[0].lastIndexOf('(');
+                           var path = match[0].substring(0, pathLength);
+                           var lineNo = match[0].substring(pathLength + 1, match[0].length - 1);
+                           var remainder = line.substring(match[0].length);
+                           if (testPathResolveRoot) {
+                               path = resolve(testPathResolveRoot, path);
+                           }
+                           line = path + ':' + lineNo + remainder;
+                       }
+                    }
+                    isRun = line.startsWith('[ RUN      ]');
+                    this._outputChannel.appendLine(line);
+                    if (!addedNewLine && line.startsWith("[----------]")) {
+                        this._outputChannel.appendLine('');
+                        addedNewLine = true;
+                    } else {
+                        addedNewLine = false;
+                    }
                 }
             });
             this.controller.refreshDisplay(RunStatus.Running, this._passedTests, this._failedTests + this._passedTests);
@@ -338,6 +362,13 @@ export class GTestWrapper {
     }
 
 }
+
+const regexSeparator = "(\\\\|\\/)";
+const regexStartPath = "([a-zA-z]:\\\\|\\\\\\\\|\\\\|\\/\\/|\\/)?";
+const regexValidName = "[^\\/\\\\\\?\\*:]+";
+const regexFolder = "(" + regexValidName + regexSeparator + ")*";
+const regexPath = regexStartPath + regexFolder + regexValidName;
+const regexPathAndLine = "^" + regexPath + "\\(\\d+\\)";
 
 interface CppDebugConfig extends DebugConfiguration {
     program: string;

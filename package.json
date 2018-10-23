@@ -233,7 +233,7 @@
             ]
         },
         "languages": [{
-            "id": "googletestout",
+            "id": "log",
             "aliases": ["GoogleTest Output", "googletestout"],
             "extensions": [".log"],
             "mimetypes": [
@@ -244,7 +244,7 @@
             ]
         }],
         "grammars": [{
-            "language": "googletestout",
+            "language": "log",
             "scopeName": "text.googletestout",
             "path": "./syntaxes/googletestout.tmLanguage.json"            
         }]
