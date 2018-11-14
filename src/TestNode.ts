@@ -37,12 +37,8 @@ export class TestNode {
         var result = name;
         var paramPos = result.indexOf("# GetParam() = ");
         if (paramPos > 0) {
-            var start = result.substring(0, result.indexOf('/'));
             var parameters = result.substring(paramPos + 15);
-			 if (!parameters.startsWith("(")) {
-                 parameters = "(" + parameters + ")";
-             }
-             return start + parameters;
+             return parameters;
         }
         if (result.endsWith(".") || result.endsWith("/")) {
             result = result.substring(0, result.length - 1);
