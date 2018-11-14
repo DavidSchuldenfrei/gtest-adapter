@@ -69,7 +69,7 @@ export class GTestWrapper {
         const config = this.getTestsConfig();
         if (!config)
             return;
-        this._runner = spawn(config.program, args, { detached: true, cwd: this.getWorkspaceFolder(), env: config.env });
+        this._runner = spawn(config.program, args, { detached: true, cwd: config.cwd, env: config.env });
         if (workspace.getConfiguration().get<boolean>("gtest-adapter.showRunOutput")) {
             this._outputChannel.show();
         }
@@ -240,8 +240,7 @@ export class GTestWrapper {
             window.showErrorMessage("Selected debug configuration is missing the program field.");
             return undefined;
         }
-        testConfig = testConfig.replace("${workspaceFolder}", workspaceFolder);
-        testConfig = testConfig.replace("${workspaceRoot}", workspaceFolder); //Deprecated but might still be used.
+        testConfig = this.expandEnv(testConfig, workspaceFolder);
         const testApp = resolve(workspaceFolder, testConfig);
         if (!appExistsSync(testApp)) {
             window.showErrorMessage(`Unable to locate Google Test in debug configuration:\n${testApp}`, 'Build', 'Switch', 'Ignore').then(selection => {
@@ -262,7 +261,18 @@ export class GTestWrapper {
                 }
             });
         }
-        return new TestConfig(testApp, env);
+        var cwd = debugConfig.cwd;
+        if (!cwd) {
+            cwd = "${workspaceFolder}";
+        }
+        cwd = this.expandEnv(cwd, workspaceFolder);
+        return new TestConfig(testApp, env, cwd);
+    }
+
+    private expandEnv(path: string, workspaceFolder: string): string {
+        path = path.replace("${workspaceFolder}", workspaceFolder);
+        path = path.replace("${workspaceRoot}", workspaceFolder); //Deprecated but might still be used.
+        return path;
     }
 
     private getWorkspaceFolder(): string {
@@ -370,9 +380,10 @@ interface CppDebugConfig extends DebugConfiguration {
     program: string;
     args?: string[];
     environment?:any[];
+    cwd?: string;
 }
 
 class TestConfig {
-    constructor (public program: string, public env?: any) {        
+    constructor (public program: string, public env: any, public cwd: string) {
     }
 }
