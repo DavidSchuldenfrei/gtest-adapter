@@ -53,10 +53,14 @@ export class Controller {
                 this._codeLensProvider.onDidChangeCodeLensesEmitter.fire();
             }
         }));
-        
+
         tasks.onDidEndTask(function(event: TaskEndEvent) { 
             if ((event.execution.task.group == TaskGroup.Build || event.execution.task.group == TaskGroup.Rebuild) && workspace.getConfiguration().get<boolean>("gtest-adapter.refreshAfterBuild")) {
-                commands.executeCommand("gtestExplorer.refresh");
+                commands.executeCommand("gtestExplorer.refresh").then(() => {
+                    if (workspace.getConfiguration().get<boolean>("gtest-adapter.runAfterBuild")) {
+                        commands.executeCommand("gtestExplorer.runAll");
+                    }
+                });
             }
         });
         SchemeSetup.Setup();
