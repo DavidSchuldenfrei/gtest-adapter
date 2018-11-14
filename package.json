@@ -212,6 +212,11 @@
                     "default": true,
                     "description": "Determines whether to refresh the test tree after a build was completed."
                 },
+                "gtest-adapter.runAfterBuild": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Determines whether to run the tests after a build was completed. Will only work if gtest-adapter.refreshAfterBuild is true"
+                },
                 "gtest-adapter.showRunOutput": {
                     "type": "boolean",
                     "default": true,
