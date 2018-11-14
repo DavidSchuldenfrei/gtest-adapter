@@ -322,7 +322,14 @@ export class GTestWrapper {
         for (var i = 0; i < tests.length; ++i) {
             var currentTestLine = tests[i];
             if (currentTestLine.startsWith(" ")) {
-                current.addChild(new TestNode(current, currentName, currentTestLine));
+                var indexOfSlash = currentTestLine.indexOf("/");
+                if (indexOfSlash > 0) {
+                    var startOfLine = currentTestLine.substring(0, indexOfSlash);
+                    var testGroupNode = current.addChild(new TestNode(current, currentName, startOfLine));
+                    testGroupNode.addChild(new TestNode(current, currentName, currentTestLine));
+                } else {
+                    current.addChild(new TestNode(current, currentName, currentTestLine));
+                }
             } else {
                 var indexOfSlash = currentTestLine.indexOf("/");
                 if (indexOfSlash > 0) {
