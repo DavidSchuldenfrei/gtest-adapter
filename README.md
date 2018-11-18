@@ -22,6 +22,8 @@ This extension contributes the following settings:
 
 * `gtest-adapter.refreshAfterBuild`: Determines whether to automatically refresh the test tree after each build. Default is true
 
+* `gtest-adapter.runAfterBuild`: Determines whether to automatically run tests after each build. Only relevant if `gtest-adapter.refreshAfterBuild` is true. Default is false
+
 * `gtest-adapter.gotoTestTitle`: Used for localization. Title for [Go To Test] in CodeLens. 
 
 * `gtest-adapter.runTitle`: Used for localization. Title for [Run] in CodeLens. 
@@ -49,6 +51,14 @@ In addition to these specific extensions settings, this extension creates adds t
 * Links in GoogleTest output wich contain spaces are not recognized. VsCode doesn't support such links, either.
 
 ## Release Notes
+
+### 1.5.0
+
+* Feature: Better Hierarchical display when having parametrized tests
+
+* Feature: If `gtest-adapter.runAfterBuild` is set to true (`gtest-adapter.refreshAfterBuild` is set to true), the Google tests will run after every build
+
+* Bug Fix: Uses the `cwd` value from the debug configuration when running Google tests
 
 ### 1.4.0
 

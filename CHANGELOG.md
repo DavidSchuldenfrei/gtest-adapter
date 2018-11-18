@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.5.0]
+
+* Better Hierarchical display when having parametrized tests
+
 ### [1.4.0]
 
 * Supports links to files from GoogleTest output.
