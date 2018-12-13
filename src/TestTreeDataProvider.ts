@@ -65,6 +65,9 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             if (!root) {
                 return new Array<TestNode>();
             } else {
+                if (root.children.length == 1) {
+                    root = root.children[0];
+                }
                 this._root = root;
                 this.registerLeaves(root);
                 return root.children;

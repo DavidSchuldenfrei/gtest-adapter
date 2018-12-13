@@ -51,6 +51,8 @@ export class TestNode {
     }
 
     public get fullName(): string {
+        if (!this.parent)
+            return '*';
         if (this.isFolder) {
             var parts = this._fullnames.slice();
             parts.forEach((fn, i, arr) => { arr[i] = fn + "*" });
