@@ -16,7 +16,7 @@ This extension is standalone, and doesn't depend on any other extensions. To use
 
 This extension contributes the following settings:
 
-* `gtest-adapter.debugConfig`: The name of the debug configuration which defines the GTest test application, and how to debug it.
+* `gtest-adapter.debugConfig`: The name of the debug configuration(s) which defines the GTest test application, and how to debug it. This can be an array of configurations.
 
 * `gtest-adapter.showCodeLens`: Determines whether to show the CodeLens test status or not. Default is true
 
@@ -36,6 +36,8 @@ This extension contributes the following settings:
 
 * `gtest-adapter.clearRunOutput`: Determines whether to clear the output of the GoogleTest runs whenever starting a new run. Default is true
 
+* `gtest-adapter.mainConfig`: Determines which config setting is used for CodeLens, when multiple settings are configured for `gtest-adapter.debugConfig`
+
 In addition to these specific extensions settings, this extension creates adds to the `editor.tokenColorCustomizations` setting to allow for coloring the GoogleTest output.
 
 ## Known Issues
@@ -50,7 +52,15 @@ In addition to these specific extensions settings, this extension creates adds t
 
 * Links in GoogleTest output wich contain spaces are not recognized. VsCode doesn't support such links, either.
 
+* When running with multiple configurations, Codelens only takes 1 configuration into account. This account can be specified with the setting `gtest-adapter.mainConfig`
+
+* When running with multiple configurations, `Debug All` will only debug the current tree.
+
 ## Release Notes
+
+### 1.6.0
+
+* Feature: Allows using multiple debug configs. When multiple debug configs are used, each config will have its own subtree.
 
 ### 1.5.0
 

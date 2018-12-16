@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -226,6 +226,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Determines whether to clear the output of the GoogleTest runs whenever starting a new run."
+                },
+                "gtest-adapter.mainConfig": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The main debug configuration (when using multiple configurations) used for codelens."
                 }
             }
         },

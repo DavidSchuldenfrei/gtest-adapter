@@ -18,10 +18,10 @@ export class Controller {
     private _tree: TestTreeDataProvider;
     private _statusBar: StatusBar;
     private _treeView: TreeView<TestNode>;
-    private _testLocations: Map<string, Map<number, LineInfo>>;
+    private _testLocations: Map<string, Map<string, Map<number, LineInfo>>>;
     private _codeLensProvider: TestCodeCodeLensProvider = new TestCodeCodeLensProvider();
     private _lineInfosToResfresh: Set<LineInfo> = new Set();
-    private _testPathResolveRoot: string | undefined;
+    private _testPathResolveRoot: Map<string, string | undefined> = new Map();
 
     constructor(context: ExtensionContext) {
         this._gtestWrapper = new GTestWrapper(this);
@@ -92,12 +92,16 @@ export class Controller {
     public setTestStatus(testName: string, testStatus: Status) {
         var node = this._tree.setTestStatus(testName, testStatus);
         if (node && node.location) {
-            var file = this._testLocations.get(node.location.file);
-            if (file) {
-                var line = file.get(node.location.line);
-                if (line) {
-                    line.notifyNodeStatus(testStatus);
-                    this._lineInfosToResfresh.add(line);
+            var configName = this.getNodeConfigName(node);
+            var locations = this._testLocations.get(configName);
+            if (locations) {
+                var file = locations.get(node.location.file);
+                if (file) {
+                    var line = file.get(node.location.line);
+                    if (line) {
+                        line.notifyNodeStatus(testStatus);
+                        this._lineInfosToResfresh.add(line);
+                    }
                 }
             }
         } 
@@ -113,23 +117,39 @@ export class Controller {
         this._codeLensProvider.onDidChangeCodeLensesEmitter.fire();
     }
 
-    public loadTestsRoot(): Thenable<TestNode | undefined> {
+    public loadTestsRoot(): Thenable<TestNode | undefined> {        
         return this._gtestWrapper.loadTestsRootAsync();
     }
 
     public async notifyTreeLoaded(root: TestNode) {
-        this._testLocations.clear();
-        this.addNodeToLocations(root);
-        var prefix = await this.findPrefix(Array.from(this._testLocations.keys()));
-        this._testPathResolveRoot = prefix.root;
+        let treeTestLocations: Map<string, Map<number, LineInfo>> = new Map();
+        this._testLocations.set(root.name, treeTestLocations);
+        this.addNodeToLocations(treeTestLocations, root);
+        var prefix = await this.findPrefix(Array.from(treeTestLocations.keys()));
+        this._testPathResolveRoot.set(root.name, prefix.root);
         if (prefix.root) {
             var folder = prefix.root
             var newTestLocations = new Map();
-            this._testLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key.substr(3 * prefix.parentFoldersCount)), value));
-            this._testLocations = newTestLocations;
+            treeTestLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key.substr(3 * prefix.parentFoldersCount)), value));
+            this._testLocations.set(root.name, newTestLocations);
             this.fixLocations(prefix.root, prefix.parentFoldersCount, root);
         }
-        this._codeLensProvider.testLocations = this._testLocations;
+    }
+
+    public notifyAllTreesLoaded() {
+        let configs = Array.from(this._testLocations.keys());
+        if (configs.length == 0)
+            return;
+        let mainConfig: string | undefined = "";
+        if (configs.length == 1) {
+            mainConfig = configs[0];
+        } else {
+            mainConfig = workspace.getConfiguration("gtest-adapter").get<string>("mainConfig");
+            if (!mainConfig) {
+                mainConfig = configs[0];
+            }
+        }
+        this._codeLensProvider.testLocations = this._testLocations.get(mainConfig);
     }
 
     private fixLocations(rootFolder: string, depth: number, root: TestNode) {
@@ -186,13 +206,13 @@ export class Controller {
         return depth;
     }
 
-    private addNodeToLocations(node: TestNode) {
+    private addNodeToLocations(treeTestLocations: Map<string, Map<number, LineInfo>>, node: TestNode) {
         if (node.location) {
-            var file = this._testLocations.get(node.location.file);
+            var file = treeTestLocations.get(node.location.file);
             if (!file) {
                 file = new Map();
-                this._testLocations.set(node.location.file, file);
-            }
+                treeTestLocations.set(node.location.file, file);
+            }            
             var line = file.get(node.location.line);
             if (!line) {
                 line = new LineInfo();
@@ -200,7 +220,7 @@ export class Controller {
             }
             line.addNode(node);
         }
-        node.children.forEach(child => this.addNodeToLocations(child));
+        node.children.forEach(child => this.addNodeToLocations(treeTestLocations, child));
     }
 
     private runAllTests() {
@@ -221,17 +241,27 @@ export class Controller {
     private runTestByNode(node: TestNode) {
         this._tree.clearResults(node);
         this._lineInfosToResfresh.clear();
-        this._gtestWrapper.runTestByName(node.fullName, this._testPathResolveRoot);
+        var configName = this.getNodeConfigName(node);
+        this._gtestWrapper.runTestByName(configName, node.fullName, this._testPathResolveRoot.get(configName));
+    }
+
+    private getNodeConfigName(node: TestNode): string {
+        if (!node.parent)
+            return node.name;
+        return this.getNodeConfigName(node.parent);
     }
 
     private debugTestByNode(node: TestNode) {
-        this._gtestWrapper.debugTest(node.fullName);
+        this._gtestWrapper.debugTest(this.getNodeConfigName(node), node.fullName);
     }
 
     private rerun() {
-        this._tree.clearResults(this._currentNode);
-        this._lineInfosToResfresh.clear();
-        this._gtestWrapper.runTestByName(this._currentTestName, this._testPathResolveRoot);
+        if (this._currentNode) {
+            this._tree.clearResults(this._currentNode);
+            this._lineInfosToResfresh.clear();
+            var configName = this.getNodeConfigName(this._currentNode);
+            this._gtestWrapper.runTestByName(configName, this._currentTestName, this._testPathResolveRoot.get(configName));
+        }
     }
 
     private stopRun() {
@@ -240,7 +270,7 @@ export class Controller {
 
     private debugTest(node: TestNode) {
         this.initCurrent(node);
-        this._gtestWrapper.debugTest(this._currentTestName);
+        this._gtestWrapper.debugTest(this.getNodeConfigName(node), this._currentTestName);
     }
 
     private switchConfig() {
@@ -281,6 +311,5 @@ export class Controller {
 
     private gotoTree(node: TestNode) {
         this._treeView.reveal(node);
-        commands.executeCommand('workbench.view.test');
     }
 }
