@@ -7,10 +7,12 @@ export class TestCodeCodeLensProvider implements CodeLensProvider {
     public onDidChangeCodeLensesEmitter: EventEmitter<any> = new EventEmitter<any>();
     readonly onDidChangeCodeLenses: Event<any> = this.onDidChangeCodeLensesEmitter.event;
 
-    public testLocations: Map<string, Map<number, LineInfo>> = new Map();
+    public testLocations: Map<string, Map<number, LineInfo>> | undefined = new Map();
 
     public provideCodeLenses(document: TextDocument, token: CancellationToken): ProviderResult<CodeLens[]> {
         if (!CodeLensSettings.codelensEnabled)
+            return undefined;
+        if (!this.testLocations)
             return undefined;
         var file = this.testLocations.get(document.fileName);
         if (!file)

@@ -1,4 +1,4 @@
-import { DebugConfiguration,workspace, debug, window, commands, ConfigurationTarget, OutputChannel, tasks, TaskGroup, TaskEndEvent } from 'vscode';
+import { workspace, debug, window, commands, ConfigurationTarget, OutputChannel } from 'vscode';
 import { ChildProcess, spawn, execSync } from 'child_process';
 import { tmpdir } from 'os';
 import { Controller } from './Controller';
@@ -8,37 +8,8 @@ import { Status, TestNode } from './TestNode';
 import { RunStatus } from './RunStatus';
 import { JsonEntry } from './JsonOutputs';
 import { TestLocation } from './TestLocation';
-
-function getPlatform(): string {
-    if (process.platform === 'win32')
-        return 'windows';
-    else if (process.platform === 'darwin')
-        return 'osx';
-    else return 'linux';
-}
- function appExistsSync(app: string) : boolean
-{
-    let exists = existsSync(app);
-    if (!exists)
-    {
-        const platform = getPlatform();
-        const extensions_exist = (extensions : string[]) => {
-            for (const ext of extensions)
-            {
-                if (!app.endsWith(ext))
-                {
-                    if (existsSync(app + ext)) return true;
-                }
-            }
-            return false;
-        }
-         if (platform === "windows")
-        {
-            return extensions_exist(['.exe']);
-        }
-    }
-    return exists;
-}
+import { CppDebugConfig } from './CppDebugConfig';
+import { ConfigUtils } from './ConfigUtils';
 
 export class GTestWrapper {
     private _passedTests: number;
@@ -135,11 +106,14 @@ export class GTestWrapper {
     }
 
     public debugTest(configName: string, testName: string) {
-        var debugConfigs = this.getDebugConfig();
+        var debugConfigs = ConfigUtils.getDebugConfig();
         if (debugConfigs) {
             const debugConfig = debugConfigs.find(dc => dc.name == configName);
             if (workspace.workspaceFolders && debugConfig) {
-                debugConfig.args = ['--gtest_filter=' + testName];
+                if (!debugConfig.args) {
+                    debugConfig.args = []
+                }
+                debugConfig.args.push('--gtest_filter=' + testName);
                 debug.startDebugging(workspace.workspaceFolders[0], debugConfig);
                 commands.executeCommand('workbench.view.debug');
             }
@@ -173,61 +147,8 @@ export class GTestWrapper {
         }
     }   
 
-    private getDebugConfig(): CppDebugConfig[] | undefined {
-        let debugConfigNames = workspace.getConfiguration("gtest-adapter").get<string | string[]>("debugConfig");
-        if (!debugConfigNames) {
-            return undefined;
-        }
-        if (! Array.isArray(debugConfigNames)) {
-            debugConfigNames = [debugConfigNames];
-        }
-        const namesSet = new Set(debugConfigNames);
-        const debugConfigs = workspace.getConfiguration("launch", null).get("configurations") as Array<CppDebugConfig>;
-        return debugConfigs.filter(config => namesSet.has(config.name));
-    }
-
-    private getDebugProgram(debugConfig: CppDebugConfig): string | undefined {
-        let program = debugConfig.program;
-        const platform = getPlatform();
-        if (debugConfig[platform] && debugConfig[platform].program)
-            program = debugConfig[platform].program;
-        return program;
-    }
-
-    private runBuildTask()
-    {
-        tasks.fetchTasks().then(task_list => {
-            const build_task_list = task_list.filter(task => task.group === TaskGroup.Build);
-            const build_task_names = build_task_list.map(task => task.name);
-            if (build_task_names.length > 0)
-            {
-                window.showQuickPick(build_task_names).then(build_task_name => {
-                    if (build_task_name)
-                    {
-                        const build_task = build_task_list.find(task => task.name == build_task_name);
-                        if (build_task)
-                        {
-                            const task_end_event = (event: TaskEndEvent) =>
-                            {
-                                if (event.execution.task.name === build_task_name)
-                                {
-                                    sub.dispose();
-                                    this.controller.reloadAll();
-                                }
-                            };
-                            const sub = tasks.onDidEndTask(task_end_event);
-                            tasks.executeTask(build_task);
-                        }
-                        else window.showErrorMessage(`Failed to execute "${build_task_name}" task.`);
-                    }
-                });                             
-            }
-            else window.showErrorMessage('No build tasks available.');
-        });
-    }
-
     private getTestsConfig(): TestConfig[] | undefined {
-        var debugConfig = this.getDebugConfig();
+        var debugConfig = ConfigUtils.getDebugConfig();
         if (!debugConfig) {
             const debugConfigs = workspace.getConfiguration("launch").get("configurations") as Array<CppDebugConfig>;
             if (debugConfigs.length == 0) {
@@ -249,7 +170,7 @@ export class GTestWrapper {
         }
 
         var workspaceFolder = this.getWorkspaceFolder();
-        debugConfig = debugConfig.filter(dc => this.isValidDebugConfig(workspaceFolder, dc));
+        debugConfig = debugConfig.filter(dc => ConfigUtils.isValid(workspaceFolder, dc));
         var env = process.env;
         var result = debugConfig.map(dc => {
             if (dc.environment) {
@@ -264,25 +185,11 @@ export class GTestWrapper {
             if (!cwd) {
                 cwd = "${workspaceFolder}";
             }
-            cwd = this.expandEnv(cwd, workspaceFolder);
-            const testApp = resolve(workspaceFolder, this.expandEnv(this.getDebugProgram(dc) as string, workspaceFolder));
+            cwd = ConfigUtils.expandEnv(cwd, workspaceFolder);
+            const testApp = resolve(workspaceFolder, ConfigUtils.expandEnv(ConfigUtils.getDebugProgram(dc) as string, workspaceFolder));
             return new TestConfig(dc.name, testApp, env, cwd);    
         });
         return result;
-    }
-
-    private isValidDebugConfig(workspaceFolder: string, debugConfig: CppDebugConfig) {
-        var program = this.getDebugProgram(debugConfig);
-        if (!program)
-            return false;
-        program = this.expandEnv(program, workspaceFolder);
-        return appExistsSync(resolve(workspaceFolder, program));
-    }
-
-    private expandEnv(path: string, workspaceFolder: string): string {
-        path = path.replace("${workspaceFolder}", workspaceFolder);
-        path = path.replace("${workspaceRoot}", workspaceFolder); //Deprecated but might still be used.
-        return path;
     }
 
     private getWorkspaceFolder(): string {
@@ -307,21 +214,22 @@ export class GTestWrapper {
                     dummy.addChild(root);
             }
         }
+        this.controller.notifyAllTreesLoaded();
         if  (dummy.children.length > 0)
             return dummy;
     }
 
-    private loadTestsRootForConfigAsync(config: TestConfig) {
+    private async loadTestsRootForConfigAsync(config: TestConfig) {
         var filename = 'tmp' + Math.floor(1000000 * Math.random()) + Date.now() + '.json';
         filename = join(tmpdir(), filename);
-        return this.loadTestLines(config, filename).then((fullNames: string[]) => {
+        return this.loadTestLines(config, filename).then(async (fullNames: string[]) => {
             if (fullNames.length == 0) {
                 if (existsSync(filename)) {
                     unlinkSync(filename);
                 }
                 return undefined;
             }
-            return this.loadTestsRoot(config.name, fullNames, filename);
+            return await this.loadTestsRoot(config.name, fullNames, filename);
         });
     }
 
@@ -336,7 +244,7 @@ export class GTestWrapper {
         });
     }
 
-    private loadTestsRoot(configname: string, tests: string[], filename: string): TestNode {
+    private async loadTestsRoot(configname: string, tests: string[], filename: string) {
         var root = new TestNode(undefined, "", configname);
         var current = root;
         var currentName = "";
@@ -386,7 +294,7 @@ export class GTestWrapper {
         } else {
             workspace.getConfiguration().update("gtest-adapter.supportLocation", false, ConfigurationTarget.Workspace);
         }
-        this.controller.notifyTreeLoaded(root);
+        await this.controller.notifyTreeLoaded(root);
         return root;
     }
 
@@ -402,13 +310,6 @@ export class GTestWrapper {
 
 
 const regexPathAndLine = /^([a-zA-Z]:\\|\\\\|\\|\/\/|\/)?([^ \/\\\?\*:]+(\\|\/))*[^ \/\\\?\*:]+\(\d+\)/g;
-
-interface CppDebugConfig extends DebugConfiguration {
-    program: string;
-    args?: string[];
-    environment?:any[];
-    cwd?: string;
-}
 
 class TestConfig {
     constructor (public name: string, public program: string, public env: any, public cwd: string) {

@@ -226,6 +226,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Determines whether to clear the output of the GoogleTest runs whenever starting a new run."
+                },
+                "gtest-adapter.mainConfig": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The main debug configuration (when using multiple configurations) used for codelens."
                 }
             }
         },

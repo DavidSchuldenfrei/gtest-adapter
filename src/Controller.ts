@@ -122,18 +122,34 @@ export class Controller {
     }
 
     public async notifyTreeLoaded(root: TestNode) {
-        this._testLocations.clear();
-        this.addNodeToLocations(root);
-        var prefix = await this.findPrefix(Array.from(this._testLocations.keys()));
+        let treeTestLocations: Map<string, Map<number, LineInfo>> = new Map();
+        this._testLocations.set(root.name, treeTestLocations);
+        this.addNodeToLocations(treeTestLocations, root);
+        var prefix = await this.findPrefix(Array.from(treeTestLocations.keys()));
         this._testPathResolveRoot.set(root.name, prefix.root);
         if (prefix.root) {
             var folder = prefix.root
             var newTestLocations = new Map();
-            this._testLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key.substr(3 * prefix.parentFoldersCount)), value));
-            this._testLocations = newTestLocations;
+            treeTestLocations.forEach((value, key) => newTestLocations.set(this.resolveNative(folder, key.substr(3 * prefix.parentFoldersCount)), value));
+            this._testLocations.set(root.name, newTestLocations);
             this.fixLocations(prefix.root, prefix.parentFoldersCount, root);
         }
-        this._codeLensProvider.testLocations = this._testLocations;
+    }
+
+    public notifyAllTreesLoaded() {
+        let configs = Array.from(this._testLocations.keys());
+        if (configs.length == 0)
+            return;
+        let mainConfig: string | undefined = "";
+        if (configs.length == 1) {
+            mainConfig = configs[0];
+        } else {
+            mainConfig = workspace.getConfiguration("gtest-adapter").get<string>("mainConfig");
+            if (!mainConfig) {
+                mainConfig = configs[0];
+            }
+        }
+        this._codeLensProvider.testLocations = this._testLocations.get(mainConfig);
     }
 
     private fixLocations(rootFolder: string, depth: number, root: TestNode) {
@@ -190,18 +206,12 @@ export class Controller {
         return depth;
     }
 
-    private addNodeToLocations(node: TestNode) {
+    private addNodeToLocations(treeTestLocations: Map<string, Map<number, LineInfo>>, node: TestNode) {
         if (node.location) {
-            var configName = this.getNodeConfigName(node);
-            var locations = this._testLocations.get(configName);
-            if (!locations) {
-                locations = new Map();
-                this._testLocations.set(configName, locations);
-            }
-            var file = locations.get(node.location.file);
+            var file = treeTestLocations.get(node.location.file);
             if (!file) {
                 file = new Map();
-                this._testLocations.set(node.location.file, file);
+                treeTestLocations.set(node.location.file, file);
             }            
             var line = file.get(node.location.line);
             if (!line) {
@@ -210,7 +220,7 @@ export class Controller {
             }
             line.addNode(node);
         }
-        node.children.forEach(child => this.addNodeToLocations(child));
+        node.children.forEach(child => this.addNodeToLocations(treeTestLocations, child));
     }
 
     private runAllTests() {
@@ -301,6 +311,5 @@ export class Controller {
 
     private gotoTree(node: TestNode) {
         this._treeView.reveal(node);
-        commands.executeCommand('workbench.view.test');
     }
 }
