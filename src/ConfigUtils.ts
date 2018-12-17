@@ -58,6 +58,17 @@ export class ConfigUtils {
         return path;
     }
 
+    public static getConfigs() {
+        let debugConfigNames = workspace.getConfiguration("gtest-adapter").get<string | string[]>("debugConfig");
+        if (!debugConfigNames) {
+            return undefined;
+        }
+        if (! Array.isArray(debugConfigNames)) {
+            debugConfigNames = [debugConfigNames];
+        }
+        return new Set(debugConfigNames);
+    }
+
     public static getDebugConfig(): CppDebugConfig[] | undefined {
         let debugConfigNames = workspace.getConfiguration("gtest-adapter").get<string | string[]>("debugConfig");
         if (!debugConfigNames) {
@@ -66,7 +77,10 @@ export class ConfigUtils {
         if (! Array.isArray(debugConfigNames)) {
             debugConfigNames = [debugConfigNames];
         }
-        const namesSet = new Set(debugConfigNames);
+        const namesSet = ConfigUtils.getConfigs();
+        if (!namesSet) {
+            return undefined;
+        }
         const debugConfigs = workspace.getConfiguration("launch", null).get("configurations") as Array<CppDebugConfig>;
         return debugConfigs.filter(config => namesSet.has(config.name));
     }

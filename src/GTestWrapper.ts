@@ -136,7 +136,8 @@ export class GTestWrapper {
         if (debugConfigs.length == 0) {
             window.showErrorMessage(`You first need to define a debug configuration, for your tests`);
         } else {
-            let options = debugConfigs.map(s => s.name);
+            let current = ConfigUtils.getConfigs();
+            let options = debugConfigs.map(s => { return { label: s.name, picked: current && current.has(s.name) }; });
             window.showQuickPick(options, {canPickMany: true})
                 .then(s => {
                     if (s) {
