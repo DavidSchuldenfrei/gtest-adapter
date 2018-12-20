@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -180,7 +180,7 @@
         "configuration": {
             "properties": {
                 "gtest-adapter.debugConfig": {
-                    "type": "string",
+                    "type": ["string", "string[]"],
                     "description": "Debug configuration for debugging unittests."
                 },
                 "gtest-adapter.supportLocation": {

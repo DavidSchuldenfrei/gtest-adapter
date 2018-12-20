@@ -58,7 +58,7 @@ In addition to these specific extensions settings, this extension creates adds t
 
 ## Release Notes
 
-### 1.6.1
+### 1.6.2
 
 * Feature: Allows using multiple debug configs. When multiple debug configs are used, each config will have its own subtree.
 

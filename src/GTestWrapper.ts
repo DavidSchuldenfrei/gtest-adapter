@@ -141,7 +141,7 @@ export class GTestWrapper {
             window.showQuickPick(options, {canPickMany: true})
                 .then(s => {
                     if (s) {
-                        workspace.getConfiguration().update("gtest-adapter.debugConfig", s, ConfigurationTarget.Workspace);
+                        workspace.getConfiguration().update("gtest-adapter.debugConfig", s.map(entry => entry.label), ConfigurationTarget.Workspace);
                         this.controller.reloadAll();
                     }
                 });
