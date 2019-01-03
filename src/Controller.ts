@@ -270,7 +270,8 @@ export class Controller {
 
     private debugTest(node: TestNode) {
         this.initCurrent(node);
-        this._gtestWrapper.debugTest(this.getNodeConfigName(node), this._currentTestName);
+        if (this._currentNode)
+            this._gtestWrapper.debugTest(this.getNodeConfigName(this._currentNode), this._currentTestName);
     }
 
     private switchConfig() {
