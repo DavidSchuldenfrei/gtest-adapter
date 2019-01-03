@@ -22,6 +22,8 @@ export class Controller {
     private _codeLensProvider: TestCodeCodeLensProvider = new TestCodeCodeLensProvider();
     private _lineInfosToResfresh: Set<LineInfo> = new Set();
     private _testPathResolveRoot: Map<string, string | undefined> = new Map();
+    private _lastNodeClicked: TestNode | undefined;
+    private _lastClickDate: Date;
 
     constructor(context: ExtensionContext) {
         this._gtestWrapper = new GTestWrapper(this);
@@ -30,6 +32,7 @@ export class Controller {
 
         this._treeView = window.createTreeView('gtestExplorer', { treeDataProvider : this._tree});
         this._testLocations = new Map();
+        this._lastClickDate = new Date();
 
         context.subscriptions.push(commands.registerCommand('gtestExplorer.refresh', () => this.reloadAll()));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.run', this.runCurrentTest, this));
@@ -43,6 +46,8 @@ export class Controller {
         context.subscriptions.push(commands.registerCommand('gtestExplorer.runTestByNode', node => this.runTestByNode(node)));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.debugTestByNode', node => this.debugTestByNode(node)));
         context.subscriptions.push(commands.registerCommand('gtestExplorer.gotoTree', node => this.gotoTree(node)));
+
+        context.subscriptions.push(commands.registerCommand('gtestExplorer.dblClick', node => this.dblClick(node)));
 
         context.subscriptions.push(this._codeLensProvider);
         context.subscriptions.push(languages.registerCodeLensProvider({language: "cpp", scheme: "file"}, this._codeLensProvider));
@@ -64,6 +69,16 @@ export class Controller {
             }
         });
         SchemeSetup.Setup();
+    }
+
+    private dblClick(node: TestNode) {
+        let dateDiff = <number>(<any>new Date() - <any>this._lastClickDate);
+        if (this._lastNodeClicked != node || dateDiff > 500) {
+            this._lastNodeClicked = node;
+            this._lastClickDate = new Date();
+            return;
+        }
+        this.gotoCode(node);
     }
 
     private gotoCode(node: TestNode) {

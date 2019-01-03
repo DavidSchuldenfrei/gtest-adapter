@@ -11,5 +11,7 @@ export class TestTreeItem extends TreeItem {
         } else if (node.status == Status.Failed) {
             this.iconPath = context.asAbsolutePath(path.join('resources', 'failed.png'));
         }
+        if (node.children.length == 0)
+            this.command = { title: 'dblClick', command: 'gtestExplorer.dblClick', arguments: [node] };
     }
 }
