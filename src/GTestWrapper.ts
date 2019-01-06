@@ -108,12 +108,14 @@ export class GTestWrapper {
     public debugTest(configName: string, testName: string) {
         var debugConfigs = ConfigUtils.getDebugConfig();
         if (debugConfigs) {
-            const debugConfig = debugConfigs.find(dc => dc.name == configName);
+            let debugConfig = debugConfigs.find(dc => dc.name == configName);
             if (workspace.workspaceFolders && debugConfig) {
                 if (!debugConfig.args) {
                     debugConfig.args = []
                 }
                 debugConfig.args.push('--gtest_filter=' + testName);
+                debugConfig = Object.assign({}, debugConfig);
+                debugConfig.name = '';
                 debug.startDebugging(workspace.workspaceFolders[0], debugConfig);
                 commands.executeCommand('workbench.view.debug');
             }
