@@ -58,6 +58,14 @@ In addition to these specific extensions settings, this extension creates adds t
 
 ## Release Notes
 
+### 1.7.0
+
+* Feature: When navigating from a tree leaf to the corresponding test is available, double clicking on a leaf, will go to the corresponding test.
+
+* Bug Fix: Debug from the toolbar works
+
+* Bug Fix: When debugging using the extension, Restart uses the previous selected test
+
 ### 1.6.2
 
 * Feature: Allows using multiple debug configs. When multiple debug configs are used, each config will have its own subtree.

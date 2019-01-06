@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [1.7.0]
+
+* Feature: When navigating from a tree leaf to the corresponding test is available, double clicking on a leaf, will go to the corresponding test.
+
+* Bug Fixes: Better debugging
+
 ### [1.6.2]
 
 * Feature: Allows using multiple debug configs. When multiple debug configs are used, each config will have its own subtree.
