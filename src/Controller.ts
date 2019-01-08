@@ -107,7 +107,7 @@ export class Controller {
     public setTestStatus(testName: string, testStatus: Status) {
         var node = this._tree.setTestStatus(testName, testStatus);
         if (node && node.location) {
-            var configName = this.getNodeConfigName(node);
+            var configName = node.configName;
             var locations = this._testLocations.get(configName);
             if (locations) {
                 var file = locations.get(node.location.file);
@@ -256,25 +256,19 @@ export class Controller {
     private runTestByNode(node: TestNode) {
         this._tree.clearResults(node);
         this._lineInfosToResfresh.clear();
-        var configName = this.getNodeConfigName(node);
+        var configName = node.configName;
         this._gtestWrapper.runTestByName(configName, node.fullName, this._testPathResolveRoot.get(configName));
     }
 
-    private getNodeConfigName(node: TestNode): string {
-        if (!node.parent)
-            return node.name;
-        return this.getNodeConfigName(node.parent);
-    }
-
     private debugTestByNode(node: TestNode) {
-        this._gtestWrapper.debugTest(this.getNodeConfigName(node), node.fullName);
+        this._gtestWrapper.debugTest(node.configName, node.fullName);
     }
 
     private rerun() {
         if (this._currentNode) {
             this._tree.clearResults(this._currentNode);
             this._lineInfosToResfresh.clear();
-            var configName = this.getNodeConfigName(this._currentNode);
+            var configName = this._currentNode.configName;
             this._gtestWrapper.runTestByName(configName, this._currentTestName, this._testPathResolveRoot.get(configName));
         }
     }
@@ -286,7 +280,7 @@ export class Controller {
     private debugTest(node: TestNode) {
         this.initCurrent(node);
         if (this._currentNode)
-            this._gtestWrapper.debugTest(this.getNodeConfigName(this._currentNode), this._currentTestName);
+            this._gtestWrapper.debugTest(this._currentNode.configName, this._currentTestName);
     }
 
     private switchConfig() {
@@ -310,18 +304,9 @@ export class Controller {
     }
 
     private async search() {
-        var search = await window.showInputBox(
-            { 
-                prompt: "Please enter a search string", 
-                placeHolder: "Enter (part of) the node to search for. You can use * as a wildcard."
-            });
+        var search = await window.showQuickPick(this._tree.getAll());
         if (search) {
-            var node = this._tree.searchTreeItem(search);
-            if (!node) {
-                window.showWarningMessage("Test not found.")
-            } else {
-                this._treeView.reveal(node);
-            }
+            this._treeView.reveal(search.node);
         }
     }
 

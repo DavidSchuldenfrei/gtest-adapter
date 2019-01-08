@@ -1,4 +1,4 @@
-import { EventEmitter, TreeDataProvider, TreeItem, Event, ExtensionContext, ProviderResult } from 'vscode';
+import { EventEmitter, TreeDataProvider, TreeItem, Event, ExtensionContext, ProviderResult, QuickPickItem } from 'vscode';
 import { TestNode, Status } from "./TestNode";
 import { TestTreeItem } from './TestTreeItem';
 import { Controller } from './Controller';
@@ -8,6 +8,7 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
     readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
     private _root: TestNode | undefined;
     private _leaves: any;
+    private _isMultipleConfigs = false;
 
     constructor(private readonly context: ExtensionContext, private controller: Controller) {
         this._leaves = {};
@@ -27,33 +28,6 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         return element.parent;
     }
 
-    public searchTreeItem(searchPattern: string): TestNode | undefined {
-        if (!this._root)
-            return undefined;
-        var escapedPattern = searchPattern.replace('.', '\\.').replace('*', '.*');
-        var regex = new RegExp(escapedPattern,  'i');
-
-        return this.searchInSubTree(this._root, regex);
-    }
-
-    private searchInSubTree(root: TestNode, regex: RegExp): TestNode | undefined {
-        var children = root.children;
-        for (var i = 0; i < children.length; ++i) {
-            if (this.isMatch(children[i], regex)) {
-                return children[i];
-            }
-            var result = this.searchInSubTree(children[i], regex);
-            if (result) {
-                return result;
-            }
-        }
-        return undefined;
-    }
-
-    private isMatch(node: TestNode, regex: RegExp): boolean {
-        return regex.test(node.fullName)
-    }
-
     public getChildren(element?: TestNode): TestNode[] | Thenable<TestNode[]> {
         if (element) {
             return element.children;
@@ -67,6 +41,9 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
             } else {
                 if (root.children.length == 1) {
                     root = root.children[0];
+                    this._isMultipleConfigs = false;
+                } else {
+                    this._isMultipleConfigs = true;
                 }
                 this._root = root;
                 this.registerLeaves(root);
@@ -96,6 +73,23 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         return node;
     }
 
+    public getQuickPickItems() {
+        var allNodes: NodePickItem[] = [];
+        if (this._root) {
+            let children = this._root.children;
+            children.forEach(child => this.addNodes(allNodes, child));
+        }
+        return allNodes;
+    }
+
+    private addNodes(allNodes: NodePickItem[], node: TestNode) {
+        if (node.fullName != '*') {
+            allNodes.push(new NodePickItem(node, this._isMultipleConfigs));
+        }        
+        let children = node.children;
+        children.forEach(child => this.addNodes(allNodes, child));
+    }
+
     private findNode(nodeName: string): TestNode | undefined {
         if (nodeName == '*') {
             return this._root;
@@ -114,5 +108,23 @@ export class TestTreeDataProvider implements TreeDataProvider<TestNode> {
         } else {
             this._leaves[node.fullName] = node;
         }
+    }
+}
+
+export class NodePickItem implements QuickPickItem {
+    public label: string;
+    constructor (public node: TestNode, isMultipleConfigs: boolean) {
+        let prefix = isMultipleConfigs ? node.configName + ' - ' : '';
+        this.label = prefix + this.getDisplayName(node);
+    }
+
+    private getDisplayName(node: TestNode) {
+        if (node.fullName == '*') //root. Ignore
+            return '';
+        let parentName: string = node.parent ? this.getDisplayName(node.parent) : '';
+        if (parentName && ! node.name.startsWith('(')) {
+            parentName = parentName + '::';
+        }
+        return parentName + node.name;
     }
 }
