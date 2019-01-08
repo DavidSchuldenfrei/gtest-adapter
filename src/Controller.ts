@@ -304,7 +304,7 @@ export class Controller {
     }
 
     private async search() {
-        var search = await window.showQuickPick(this._tree.getAll());
+        var search = await window.showQuickPick(this._tree.getQuickPickItems());
         if (search) {
             this._treeView.reveal(search.node);
         }
