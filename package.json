@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -119,6 +119,26 @@
             {
                 "command": "gtestExplorer.runAll",
                 "key": "alt+ctrl+r alt+ctrl+a"
+            },
+            {
+                "command": "gtestExplorer.runAll",
+                "key": "ctrl+u ctrl+l",
+                "when": "sideBarFocus && activeViewlet == 'workbench.view.extension.test'"
+            },
+            {
+                "command": "gtestExplorer.search",
+                "key": "ctrl+f",
+                "when": "sideBarFocus && activeViewlet == 'workbench.view.extension.test'"
+            },
+            {
+                "command": "gtestExplorer.run",
+                "key": "ctrl+u ctrl+r",
+                "when": "sideBarFocus && activeViewlet == 'workbench.view.extension.test'"
+            },
+            {
+                "command": "gtestExplorer.debug",
+                "key": "ctrl+u ctrl+d",
+                "when": "sideBarFocus && activeViewlet == 'workbench.view.extension.test'"
             }
         ],
         "menus": {

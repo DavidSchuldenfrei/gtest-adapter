@@ -1,9 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
-### [1.8.0]
+### [1.8.1]
 
 * Feature: Better search in tree. Similar to VsCode file search
+* More key bindings
 
 ### [1.7.0]
 

@@ -58,6 +58,10 @@ In addition to these specific extensions settings, this extension creates adds t
 
 ## Release Notes
 
+### 1.8.1
+
+* Added Key bindings, which are valid when the Google Test tree has focus
+
 ### 1.8.0
 
 * Feature: Better search in tree. Similar to VsCode file search

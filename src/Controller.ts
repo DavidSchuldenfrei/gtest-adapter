@@ -1,6 +1,6 @@
 import { GTestWrapper } from "./GTestWrapper";
 import { TestTreeDataProvider } from "./TestTreeDataProvider";
-import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent, tasks, TaskEndEvent, TaskGroup } from "vscode";
+import { ExtensionContext, window, commands, TreeView, Uri, Position, Selection, Range, languages, workspace, ConfigurationChangeEvent, tasks, TaskEndEvent, TaskGroup, TextEditorRevealType } from "vscode";
 import { Status, TestNode, LineInfo } from "./TestNode";
 import { StatusBar } from "./StatusBar";
 import { RunStatus } from "./RunStatus";
@@ -93,7 +93,7 @@ export class Controller {
                 window.showTextDocument(Uri.file(currentNode.location.file)).then(editor => { 
                     var position = new Position(location.line - 1, 0);
                     editor.selections = [new Selection(position, position)];
-                    editor.revealRange(new Range(position, position));
+                    editor.revealRange(new Range(position, position), TextEditorRevealType.InCenter);
                 });
             }
         }
@@ -304,7 +304,7 @@ export class Controller {
     }
 
     private async search() {
-        var search = await window.showQuickPick(this._tree.getQuickPickItems());
+        var search = await window.showQuickPick(this._tree.getQuickPickItems(), {placeHolder:'Find test in the Google Tests tree'});
         if (search) {
             this._treeView.reveal(search.node);
         }
