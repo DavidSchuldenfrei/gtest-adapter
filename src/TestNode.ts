@@ -94,6 +94,12 @@ export class TestNode {
             child.clearChildrenStatus();
         });
     }
+
+    public get configName(): string {
+        if (!this.parent)
+            return this.name;
+        return this.parent.configName;
+    }
 }
 
 export class LineInfo {

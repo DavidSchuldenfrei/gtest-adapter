@@ -258,7 +258,7 @@ export class GTestWrapper {
                 if (indexOfSlash > 0) {
                     var startOfLine = currentTestLine.substring(0, indexOfSlash);
                     var testGroupNode = current.addChild(new TestNode(current, currentName, startOfLine));
-                    testGroupNode.addChild(new TestNode(current, currentName, currentTestLine));
+                    testGroupNode.addChild(new TestNode(testGroupNode, currentName, currentTestLine));
                 } else {
                     current.addChild(new TestNode(current, currentName, currentTestLine));
                 }
