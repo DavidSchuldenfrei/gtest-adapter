@@ -189,7 +189,7 @@ export class GTestWrapper {
                 cwd = "${workspaceFolder}";
             }
             cwd = ConfigUtils.expandEnv(cwd, workspaceFolder);
-            const testApp = resolve(workspaceFolder, ConfigUtils.expandEnv(ConfigUtils.getDebugProgram(dc) as string, workspaceFolder));
+            const testApp = '"' + resolve(workspaceFolder, ConfigUtils.expandEnv(ConfigUtils.getDebugProgram(dc) as string, workspaceFolder)) +'"';
             return new TestConfig(dc.name, testApp, env, cwd);    
         });
         return result;
