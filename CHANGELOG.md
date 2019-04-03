@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
-### [1.8.2]
+### [1.8.3]
 
 * Bug Fix: Handles spaces in path to executable containing tests
 

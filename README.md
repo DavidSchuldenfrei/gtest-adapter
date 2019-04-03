@@ -58,6 +58,10 @@ In addition to these specific extensions settings, this extension creates adds t
 
 ## Release Notes
 
+### 1.8.3
+
+* Bug Fix: Handles spaces in path to executable containing tests
+
 ### 1.8.1
 
 * Added Key bindings, which are valid when the Google Test tree has focus
