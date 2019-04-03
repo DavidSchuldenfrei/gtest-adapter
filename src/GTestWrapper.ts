@@ -189,7 +189,7 @@ export class GTestWrapper {
                 cwd = "${workspaceFolder}";
             }
             cwd = ConfigUtils.expandEnv(cwd, workspaceFolder);
-            const testApp = '"' + resolve(workspaceFolder, ConfigUtils.expandEnv(ConfigUtils.getDebugProgram(dc) as string, workspaceFolder)) +'"';
+            const testApp = resolve(workspaceFolder, ConfigUtils.expandEnv(ConfigUtils.getDebugProgram(dc) as string, workspaceFolder));
             return new TestConfig(dc.name, testApp, env, cwd);    
         });
         return result;
@@ -238,7 +238,7 @@ export class GTestWrapper {
 
     private loadTestLines(config: TestConfig, filename: string): Thenable<string[]> {
         return new Promise((c, e) => {
-            var results = execSync(config.program + '  --gtest_list_tests --gtest_output=json:' + filename, { encoding: "utf8", env: config.env })
+            var results = execSync('"' + config.program + '"' + '  --gtest_list_tests --gtest_output=json:' + filename, { encoding: "utf8", env: config.env })
                 .split(/[\r\n]+/g);
             results = results.filter(s => s != null && s.trim() != "" 
                 && !s.startsWith("Running main(") &&!s.startsWith("Finished running"));
