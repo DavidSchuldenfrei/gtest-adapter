@@ -2,7 +2,7 @@
     "name": "gtest-adapter",
     "displayName": "GoogleTest Adapter",
     "description": "Easily run GoogleTests from VsCode",
-    "version": "1.8.3",
+    "version": "1.8.4",
     "publisher": "DavidSchuldenfrei",
     "engines": {
         "vscode": "^1.24.1"
@@ -11,7 +11,7 @@
         "name": "David Schuldenfrei"
     },
     "contributors": [
-        "Assaf Sapir", 
+        "Assaf Sapir",
         "Grant Zietsman"
     ],
     "homepage": "https://github.com/DavidSchuldenfrei/gtest-adapter/blob/master/README.md",
@@ -200,7 +200,10 @@
         "configuration": {
             "properties": {
                 "gtest-adapter.debugConfig": {
-                    "type": ["string", "string[]"],
+                    "type": [
+                        "string",
+                        "string[]"
+                    ],
                     "description": "Debug configuration for debugging unittests."
                 },
                 "gtest-adapter.supportLocation": {
@@ -262,22 +265,31 @@
                 }
             ]
         },
-        "languages": [{
-            "id": "log",
-            "aliases": ["GoogleTest Output", "googletestout"],
-            "extensions": [".log"],
-            "mimetypes": [
-                "log",
-                "text/log",
-                "text/x-code-output",
-                "x-code-output"
-            ]
-        }],
-        "grammars": [{
-            "language": "log",
-            "scopeName": "text.googletestout",
-            "path": "./syntaxes/googletestout.tmLanguage.json"            
-        }]
+        "languages": [
+            {
+                "id": "log",
+                "aliases": [
+                    "GoogleTest Output",
+                    "googletestout"
+                ],
+                "extensions": [
+                    ".log"
+                ],
+                "mimetypes": [
+                    "log",
+                    "text/log",
+                    "text/x-code-output",
+                    "x-code-output"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "log",
+                "scopeName": "text.googletestout",
+                "path": "./syntaxes/googletestout.tmLanguage.json"
+            }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

@@ -58,6 +58,10 @@ In addition to these specific extensions settings, this extension creates adds t
 
 ## Release Notes
 
+### 1.8.4
+
+* Fixed vulnerabilities
+
 ### 1.8.3
 
 * Bug Fix: Handles spaces in path to executable containing tests
