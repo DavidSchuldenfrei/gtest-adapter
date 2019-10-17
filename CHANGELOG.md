@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to the "gtest-adapter" extension will be documented in this file.
 
+### [To be released]
+
+* Bug Fix: Respect cwd from launch.json when listing tests
+
 ### [1.8.3]
 
 * Bug Fix: Handles spaces in path to executable containing tests
