@@ -238,7 +238,7 @@ export class GTestWrapper {
 
     private loadTestLines(config: TestConfig, filename: string): Thenable<string[]> {
         return new Promise((c, e) => {
-            var results = execSync('"' + config.program + '"' + '  --gtest_list_tests --gtest_output=json:' + filename, { encoding: "utf8", env: config.env })
+            var results = execSync('"' + config.program + '"' + '  --gtest_list_tests --gtest_output=json:' + filename, { encoding: "utf8", env: config.env, cwd: config.cwd })
                 .split(/[\r\n]+/g);
             results = results.filter(s => s != null && s.trim() != "" 
                 && !s.startsWith("Running main(") &&!s.startsWith("Finished running"));
