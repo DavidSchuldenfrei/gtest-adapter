@@ -180,7 +180,7 @@ export class GTestWrapper {
                 env = JSON.parse(JSON.stringify(process.env));
                 dc.environment.forEach(entry => {
                     if (entry.name != undefined && entry.value != undefined) {
-                        env[entry.name] = entry.value;
+                        env[entry.name] = ConfigUtils.expandEnv(entry.value, workspaceFolder);
                     }
                 });
             }
