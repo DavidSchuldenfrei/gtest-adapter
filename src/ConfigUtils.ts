@@ -70,13 +70,6 @@ export class ConfigUtils {
     }
 
     public static getDebugConfig(): CppDebugConfig[] | undefined {
-        let debugConfigNames = workspace.getConfiguration("gtest-adapter").get<string | string[]>("debugConfig");
-        if (!debugConfigNames) {
-            return undefined;
-        }
-        if (! Array.isArray(debugConfigNames)) {
-            debugConfigNames = [debugConfigNames];
-        }
         const namesSet = ConfigUtils.getConfigs();
         if (!namesSet) {
             return undefined;
