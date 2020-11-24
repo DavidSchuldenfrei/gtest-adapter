@@ -200,10 +200,11 @@
         "configuration": {
             "properties": {
                 "gtest-adapter.debugConfig": {
-                    "type": [
-                        "string",
-                        "string[]"
-                    ],
+                    "type": ["string", "array"],
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
                     "description": "Debug configuration for debugging unittests."
                 },
                 "gtest-adapter.supportLocation": {
