@@ -118,6 +118,7 @@ export class GTestWrapper {
                 debugConfig.name = '';
                 debug.startDebugging(workspace.workspaceFolders[0], debugConfig);
                 commands.executeCommand('workbench.view.debug');
+                debugConfig.args.pop();
             }
         }
     }
